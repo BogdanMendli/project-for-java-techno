@@ -69,8 +69,10 @@ public class Bot extends TelegramLongPollingBot {
                 default: {
                     try {
                         sendMsg(message, Weather.getWeather(message.getText(), model));
-                    } catch (IOException e) {
+                    } catch (InterruptedException e) {
                         sendMsg(message, "Город не найден!");
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }

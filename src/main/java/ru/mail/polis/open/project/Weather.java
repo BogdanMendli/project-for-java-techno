@@ -10,11 +10,24 @@ import java.net.URL;
 import java.util.Scanner;
 
 public class Weather {
+    static Scanner in;
 
-    public static String getWeather(String message, Model model) throws IOException {
+    public static String getWeather(String message, Model model) throws IOException, InterruptedException {
         URL url = new URL("http://api.openweathermap.org/data/2.5/weather?q=" + message + "&units=metric&appid=6fff53a641b9b9a799cfd6b079f5cd4e");
 
-        Scanner in = new Scanner((InputStream) url.getContent());
+//        Thread thread = new Thread(
+//            ()->{
+//                try {
+//                    in = new Scanner((InputStream) url.getContent());
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        );
+//        thread.start();
+//        thread.join();
+        in = new Scanner((InputStream) url.getContent());
+
         String result = "";
         while (in.hasNext()) {
             result += in.nextLine();
@@ -34,10 +47,10 @@ public class Weather {
             model.setMain((String) obj.get("main"));
         }
 
-        return "City: " + model.getName() + "\n" +
-            "Temperature: " + model.getTemp() + "C" + "\n" +
-            "Humidity:" + model.getHumidity() + "%" + "\n" +
-            "Main: " + model.getMain() + "\n" +
+        return "В городе: " + model.getName() + "\n" +
+            "Температура: " + model.getTemp() + "C" + "\n" +
+            "Влажность: " + model.getHumidity() + "%" + "\n" +
+            "Осадки: " + model.getMain() + "\n" +
             "http://openweathermap.org/img/w/" + model.getIcon() + ".png";
     }
 }
