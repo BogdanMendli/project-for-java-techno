@@ -15,7 +15,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,22 +75,41 @@ public class Bot extends TelegramLongPollingBot {
         // TODO: Call state machine
 
         Message message = update.getMessage();
-        if (message != null && message.hasText()) {
+
+        if (message == null) {
+            return;
+        }
+
+        if (!chatStateMachineSet.containsKey(message.getChatId())) {
+            chatStateMachineSet.put(
+                message.getChatId(),
+                new ChatStateMachine(message.getChatId(), this)
+            );
+        }
+
+        if (message.hasText()) {
             switch (message.getText()) {
                 case "/start": {
-                    sendMsg(message, "Привет! \n Введи город, в котором ты хочешь узнать погоду.");
+                    sendMsg(
+                        message,
+                        "Привет! Я бот Чижик, буду летать за нужной тебе информацией! \n"
+                            + "Выбирай, что тебе хочется узнать, а я пока приготовлюсь  к полёту."
+                    );
                     break;
                 }
                 case "/help": {
-                    sendMsg(message, "Чем могу помочь?");
-                    break;
+                    sendMsg(
+                        message,
+                        "Чтобы я мог помочь тебе узнать нужную информацию - введи /start. \n"
+                            + "А для настроек есть команда /setting."
+                    );
                 }
                 case "/setting": {
                     sendMsg(message, "Что будем настраивать?");
                     break;
                 }
                 default: {
-
+                    chatStateMachineSet.get(message.getChatId()).update(message.getText());
                 }
             }
         }
