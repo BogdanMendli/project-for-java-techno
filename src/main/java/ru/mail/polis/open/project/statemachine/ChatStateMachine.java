@@ -1,7 +1,6 @@
 package ru.mail.polis.open.project.statemachine;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
-import ru.mail.polis.open.project.Bot;
 import ru.mail.polis.open.project.statemachine.states.ChatState;
 import ru.mail.polis.open.project.statemachine.states.MainMenuChatState;
 
