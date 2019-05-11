@@ -20,6 +20,9 @@ import java.util.List;
 
 public class Bot extends TelegramLongPollingBot {
 
+    private static final String PROXY_HOST = "51.38.123.195";
+    private static final int PROXY_PORT = 1080;
+
     protected Bot(DefaultBotOptions botOptions) {
         super(botOptions);
     }
@@ -29,9 +32,8 @@ public class Bot extends TelegramLongPollingBot {
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
         try {
             DefaultBotOptions botOptions = ApiContext.getInstance(DefaultBotOptions.class);
-
-            botOptions.setProxyHost("51.38.123.195");
-            botOptions.setProxyPort(1080);
+            botOptions.setProxyHost(PROXY_HOST);
+            botOptions.setProxyPort(PROXY_PORT);
             botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
 
             telegramBotsApi.registerBot(new Bot(botOptions));
