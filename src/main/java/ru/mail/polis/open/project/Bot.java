@@ -27,10 +27,16 @@ public class Bot extends TelegramLongPollingBot {
 
     private final Map<Long, ChatStateMachine> chatStateMachineSet;
 
+    private static Bot instance = null;
+
     protected Bot(DefaultBotOptions botOptions) {
         super(botOptions);
 
         chatStateMachineSet = new HashMap<>();
+    }
+
+    public synchronized static Bot getInstance() {
+        return instance;
     }
 
     public static void main(String[] args) {
@@ -42,7 +48,9 @@ public class Bot extends TelegramLongPollingBot {
             botOptions.setProxyPort(PROXY_PORT);
             botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
 
-            telegramBotsApi.registerBot(new Bot(botOptions));
+
+            instance = new Bot(botOptions);
+            telegramBotsApi.registerBot(getInstance());
 
         } catch (TelegramApiRequestException e) {
             e.printStackTrace();
@@ -83,7 +91,7 @@ public class Bot extends TelegramLongPollingBot {
         if (!chatStateMachineSet.containsKey(message.getChatId())) {
             chatStateMachineSet.put(
                 message.getChatId(),
-                new ChatStateMachine(this)
+                new ChatStateMachine()
             );
         }
 

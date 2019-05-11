@@ -7,12 +7,9 @@ import ru.mail.polis.open.project.statemachine.states.MainMenuChatState;
 
 public class ChatStateMachine {
 
-    private Bot bot;
     private ChatState state;
 
-    public ChatStateMachine(Bot bot) {
-
-        this.bot = bot;
+    public ChatStateMachine() {
         state = new MainMenuChatState();
     }
 
@@ -23,9 +20,5 @@ public class ChatStateMachine {
 
     public void setState(ChatState state) {
         this.state = state;
-    }
-
-    public Bot getBot() {
-        return bot;
     }
 }

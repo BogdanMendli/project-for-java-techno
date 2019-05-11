@@ -3,6 +3,7 @@ package ru.mail.polis.open.project.statemachine.states;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import ru.mail.polis.open.project.Bot;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class WeatherChatState implements ChatState {
             JSONObject main = object.getJSONObject("main");
             JSONArray getArray = object.getJSONArray("weather");
 
-            stateMachine.getBot().sendMsg(
+            Bot.getInstance().sendMsg(
                 message,
                 "В городе: " + object.getString("name") + "\n" +
                     "Температура: " + main.getDouble("temp") + "C" + "\n" +
@@ -50,9 +51,9 @@ public class WeatherChatState implements ChatState {
                     "Осадки: " + getArray.getJSONObject(0).get("main") + "\n" +
                     "http://openweathermap.org/img/w/" + getArray.getJSONObject(0).get("main") + ".png");
         } catch (MalformedURLException e) {
-            stateMachine.getBot().sendMsg(message, "Города не найдено!");
+            Bot.getInstance().sendMsg(message, "Города не найдено!");
         } catch (IOException e) {
-            stateMachine.getBot().sendMsg(message, "Что-то пошло не так :(");
+            Bot.getInstance().sendMsg(message, "Что-то пошло не так :(");
         }
     }
 }
