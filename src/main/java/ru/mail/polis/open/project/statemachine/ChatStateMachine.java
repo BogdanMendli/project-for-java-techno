@@ -1,33 +1,28 @@
 package ru.mail.polis.open.project.statemachine;
 
+import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.mail.polis.open.project.Bot;
 import ru.mail.polis.open.project.statemachine.states.ChatState;
 import ru.mail.polis.open.project.statemachine.states.MainMenuChatState;
 
 public class ChatStateMachine {
 
-    private long chatId;
     private Bot bot;
     private ChatState state;
 
-    public ChatStateMachine(long chatId, Bot bot) {
+    public ChatStateMachine(Bot bot) {
 
-        this.chatId = chatId;
         this.bot = bot;
         state = new MainMenuChatState();
     }
 
-    public void update(String command) {
+    public void update(Message message) {
 
-        state.update(this, command);
+        state.update(this, message);
     }
 
     public void setState(ChatState state) {
         this.state = state;
-    }
-
-    public long getChatId() {
-        return chatId;
     }
 
     public Bot getBot() {

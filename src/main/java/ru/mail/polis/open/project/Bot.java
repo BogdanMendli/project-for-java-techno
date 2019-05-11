@@ -83,7 +83,7 @@ public class Bot extends TelegramLongPollingBot {
         if (!chatStateMachineSet.containsKey(message.getChatId())) {
             chatStateMachineSet.put(
                 message.getChatId(),
-                new ChatStateMachine(message.getChatId(), this)
+                new ChatStateMachine(this)
             );
         }
 
@@ -109,7 +109,7 @@ public class Bot extends TelegramLongPollingBot {
                     break;
                 }
                 default: {
-                    chatStateMachineSet.get(message.getChatId()).update(message.getText());
+                    chatStateMachineSet.get(message.getChatId()).update(message);
                 }
             }
         }

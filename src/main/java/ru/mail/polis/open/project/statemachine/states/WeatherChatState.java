@@ -2,8 +2,7 @@ package ru.mail.polis.open.project.statemachine.states;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 
 import java.io.IOException;
@@ -23,19 +22,15 @@ public class WeatherChatState implements ChatState {
     }
 
     @Override
-    public void update(ChatStateMachine stateMachine, String command) {
+    public void update(ChatStateMachine stateMachine, Message message) {
 
-        if (command.equals("/toMainMenu")) {
+        if (message.getText().equals("/toMainMenu")) {
             stateMachine.setState(new MainMenuChatState());
             return;
         }
 
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.enableMarkdown(true);
-        sendMessage.setChatId(stateMachine.getChatId());
-
         try {
-            URL url = new URL(urlBeforeCityName + command + urlAfterCityName);
+            URL url = new URL(urlBeforeCityName + message.getText() + urlAfterCityName);
 
             Scanner in = new Scanner((InputStream) url.getContent());
             StringBuilder result = new StringBuilder();
@@ -47,21 +42,17 @@ public class WeatherChatState implements ChatState {
             JSONObject main = object.getJSONObject("main");
             JSONArray getArray = object.getJSONArray("weather");
 
-            sendMessage.setText("В городе: " + object.getString("name") + "\n" +
-                "Температура: " + main.getDouble("temp") + "C" + "\n" +
-                "Влажность: " + main.getDouble("humidity") + "%" + "\n" +
-                "Осадки: " + getArray.getJSONObject(0).get("main") + "\n" +
-                "http://openweathermap.org/img/w/" + getArray.getJSONObject(0).get("main") + ".png");
+            stateMachine.getBot().sendMsg(
+                message,
+                "В городе: " + object.getString("name") + "\n" +
+                    "Температура: " + main.getDouble("temp") + "C" + "\n" +
+                    "Влажность: " + main.getDouble("humidity") + "%" + "\n" +
+                    "Осадки: " + getArray.getJSONObject(0).get("main") + "\n" +
+                    "http://openweathermap.org/img/w/" + getArray.getJSONObject(0).get("main") + ".png");
         } catch (MalformedURLException e) {
-            sendMessage.setText("Города не найдено!");
+            stateMachine.getBot().sendMsg(message, "Города не найдено!");
         } catch (IOException e) {
-            sendMessage.setText("Что-то пошло не так :(");
-        } finally {
-            try {
-                stateMachine.getBot().execute(sendMessage);
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
+            stateMachine.getBot().sendMsg(message, "Что-то пошло не так :(");
         }
     }
 }
