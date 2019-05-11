@@ -22,9 +22,6 @@ import java.util.Map;
 
 public class Bot extends TelegramLongPollingBot {
 
-    private static final String PROXY_HOST = "51.38.123.195";
-    private static final int PROXY_PORT = 1080;
-
     private final Map<Long, ChatStateMachine> chatStateMachineSet;
 
     private static Bot instance = null;
@@ -35,28 +32,18 @@ public class Bot extends TelegramLongPollingBot {
         chatStateMachineSet = new HashMap<>();
     }
 
-    public synchronized static Bot getInstance() {
+    public synchronized static Bot createInstance(DefaultBotOptions botOptions) {
+        if (instance != null) {
+            throw new IllegalArgumentException("Bot is already created");
+        }
+
+        instance = new Bot(botOptions);
         return instance;
     }
 
-    public static void main(String[] args) {
-        ApiContextInitializer.init();
-        TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
-        try {
-            DefaultBotOptions botOptions = ApiContext.getInstance(DefaultBotOptions.class);
-            botOptions.setProxyHost(PROXY_HOST);
-            botOptions.setProxyPort(PROXY_PORT);
-            botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
-
-
-            instance = new Bot(botOptions);
-            telegramBotsApi.registerBot(getInstance());
-
-        } catch (TelegramApiRequestException e) {
-            e.printStackTrace();
-        }
+    public synchronized static Bot getInstance() {
+        return instance;
     }
-
 
     public void sendMsg(Message message, String text) {
         SendMessage sendMessage = new SendMessage();
