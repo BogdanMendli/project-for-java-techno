@@ -77,32 +77,48 @@ public class Bot extends TelegramLongPollingBot {
 
     public void onUpdateReceived(Update update) {
         Model model = new Model();
-        if (!chatStateMachineSet.containsKey(update.getMessage().getChatId())) {
+        Message message = update.getMessage();
+
+        if (!chatStateMachineSet.containsKey(message.getChatId())) {
             chatStateMachineSet.put(
-                update.getMessage().getChatId(),
+                message.getChatId(),
                 new ChatStateMachine()
             );
         }
-        Message message = update.getMessage();
+
         if (message != null && message.hasText()) {
             switch (message.getText()) {
                 case MainMenuChatState.START : {
-                    sendMsg(message, "Привет! \n Введи город, в котором ты хочешь узнать погоду.");
+                    sendMsg(
+                        message,
+                        "Привет! Я бот Чижик, буду летать за нужной тебе информацией! \n"
+                        + "Выбирай, что тебе хочется узнать, а я пока приготовлюсь  к полёту."
+                    );
                     break;
-                }
-                case MainMenuChatState.HELP : {
-                    sendMsg(message, "Чем могу помочь?");
+                } case MainMenuChatState.HELP : {
+                    sendMsg(
+                        message,
+                        "Чтобы я мог помочь тебе узнать нужную информацию - введи /start. \n"
+                        + "А для настроек есть команда /setting."
+                    );
                     break;
-                }
-                case MainMenuChatState.SETTING : {
+                } case MainMenuChatState.SETTING : {
                     sendMsg(message, "Что будем настраивать?");
                     break;
-                }
-                default: {
+                } default: {
                     try {
-                        sendMsg(message, Weather.getWeather(message.getText(), model));
+                        sendMsg(
+                            message,
+                            Weather.getWeather(
+                                message.getText(),
+                                model
+                            )
+                        );
                     } catch (InterruptedException | FileNotFoundException e) {
-                        sendMsg(message, "Город не найден!");
+                        sendMsg(
+                            message,
+                            "Город не найден!"
+                        );
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
