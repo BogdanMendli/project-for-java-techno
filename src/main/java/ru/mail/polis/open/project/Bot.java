@@ -77,6 +77,12 @@ public class Bot extends TelegramLongPollingBot {
 
     public void onUpdateReceived(Update update) {
         Model model = new Model();
+        if (!chatStateMachineSet.containsKey(update.getMessage().getChatId())) {
+            chatStateMachineSet.put(
+                update.getMessage().getChatId(),
+                new ChatStateMachine()
+            );
+        }
         Message message = update.getMessage();
         if (message != null && message.hasText()) {
             switch (message.getText()) {
@@ -115,17 +121,12 @@ public class Bot extends TelegramLongPollingBot {
 
         List<KeyboardRow> keyboardRowList = new ArrayList<>();
         KeyboardRow keyboardFirstRow = new KeyboardRow();
-        KeyboardRow keyboardSecondRow = new KeyboardRow();
 
         keyboardFirstRow.add(new KeyboardButton(MainMenuChatState.START));
         keyboardFirstRow.add(new KeyboardButton(MainMenuChatState.HELP));
         keyboardFirstRow.add(new KeyboardButton(MainMenuChatState.SETTING));
 
-        keyboardSecondRow.add(new KeyboardButton(WeatherChatState.WEATHER));
-        keyboardSecondRow.add(new KeyboardButton(NewsChatState.NEWS));
-
         keyboardRowList.add(keyboardFirstRow);
-        keyboardRowList.add(keyboardSecondRow);
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
 
     }
