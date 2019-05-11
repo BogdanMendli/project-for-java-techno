@@ -14,7 +14,11 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
+import ru.mail.polis.open.project.statemachine.states.MainMenuChatState;
+import ru.mail.polis.open.project.statemachine.states.NewsChatState;
+import ru.mail.polis.open.project.statemachine.states.WeatherChatState;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,22 +80,22 @@ public class Bot extends TelegramLongPollingBot {
         Message message = update.getMessage();
         if (message != null && message.hasText()) {
             switch (message.getText()) {
-                case "/start": {
+                case MainMenuChatState.START : {
                     sendMsg(message, "Привет! \n Введи город, в котором ты хочешь узнать погоду.");
                     break;
                 }
-                case "/help": {
+                case MainMenuChatState.HELP : {
                     sendMsg(message, "Чем могу помочь?");
                     break;
                 }
-                case "/setting": {
+                case MainMenuChatState.SETTING : {
                     sendMsg(message, "Что будем настраивать?");
                     break;
                 }
                 default: {
                     try {
                         sendMsg(message, Weather.getWeather(message.getText(), model));
-                    } catch (InterruptedException e) {
+                    } catch (InterruptedException | FileNotFoundException e) {
                         sendMsg(message, "Город не найден!");
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -111,12 +115,17 @@ public class Bot extends TelegramLongPollingBot {
 
         List<KeyboardRow> keyboardRowList = new ArrayList<>();
         KeyboardRow keyboardFirstRow = new KeyboardRow();
+        KeyboardRow keyboardSecondRow = new KeyboardRow();
 
-        keyboardFirstRow.add(new KeyboardButton("/start"));
-        keyboardFirstRow.add(new KeyboardButton("/help"));
-        keyboardFirstRow.add(new KeyboardButton("/setting"));
+        keyboardFirstRow.add(new KeyboardButton(MainMenuChatState.START));
+        keyboardFirstRow.add(new KeyboardButton(MainMenuChatState.HELP));
+        keyboardFirstRow.add(new KeyboardButton(MainMenuChatState.SETTING));
+
+        keyboardSecondRow.add(new KeyboardButton(WeatherChatState.WEATHER));
+        keyboardSecondRow.add(new KeyboardButton(NewsChatState.NEWS));
 
         keyboardRowList.add(keyboardFirstRow);
+        keyboardRowList.add(keyboardSecondRow);
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
 
     }

@@ -6,6 +6,8 @@ import java.util.List;
 
 public class WeatherChatState implements ChatState {
 
+    public static final String WEATHER = "Weather";
+
     public WeatherChatState(List<String> cities) {
         // TODO: Draw User Interface displaying cities on buttons
     }

@@ -6,6 +6,8 @@ import java.util.List;
 
 public class NewsChatState implements ChatState {
 
+    public static final String NEWS = "News";
+
     public NewsChatState(List<String> cities) {
         // TODO: Draw User Interface displaying cities on buttons
     }
