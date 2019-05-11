@@ -1,10 +1,7 @@
 package ru.mail.polis.open.project;
 
-import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.ApiContext;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -12,14 +9,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
-import ru.mail.polis.open.project.statemachine.states.MainMenuChatState;
-import ru.mail.polis.open.project.statemachine.states.NewsChatState;
-import ru.mail.polis.open.project.statemachine.states.WeatherChatState;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,10 +18,9 @@ import java.util.Map;
 
 public class Bot extends TelegramLongPollingBot {
 
-    private static final String PROXY_HOST = "51.38.123.195";
-    private static final int PROXY_PORT = 1080;
-
     private final Map<Long, ChatStateMachine> chatStateMachineSet;
+
+    private static Bot instance = null;
 
     protected Bot(DefaultBotOptions botOptions) {
         super(botOptions);
@@ -38,22 +28,18 @@ public class Bot extends TelegramLongPollingBot {
         chatStateMachineSet = new HashMap<>();
     }
 
-    public static void main(String[] args) {
-        ApiContextInitializer.init();
-        TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
-        try {
-            DefaultBotOptions botOptions = ApiContext.getInstance(DefaultBotOptions.class);
-            botOptions.setProxyHost(PROXY_HOST);
-            botOptions.setProxyPort(PROXY_PORT);
-            botOptions.setProxyType(DefaultBotOptions.ProxyType.SOCKS5);
-
-            telegramBotsApi.registerBot(new Bot(botOptions));
-
-        } catch (TelegramApiRequestException e) {
-            e.printStackTrace();
+    public synchronized static Bot createInstance(DefaultBotOptions botOptions) {
+        if (instance != null) {
+            throw new IllegalArgumentException("Bot is already created");
         }
+
+        instance = new Bot(botOptions);
+        return instance;
     }
 
+    public synchronized static Bot getInstance() {
+        return instance;
+    }
 
     public void sendMsg(Message message, String text) {
         SendMessage sendMessage = new SendMessage();
@@ -76,8 +62,14 @@ public class Bot extends TelegramLongPollingBot {
 
 
     public void onUpdateReceived(Update update) {
-        Model model = new Model();
+
+        // TODO: Call state machine
+
         Message message = update.getMessage();
+
+        if (message == null) {
+            return;
+        }
 
         if (!chatStateMachineSet.containsKey(message.getChatId())) {
             chatStateMachineSet.put(
@@ -86,42 +78,29 @@ public class Bot extends TelegramLongPollingBot {
             );
         }
 
-        if (message != null && message.hasText()) {
+        if (message.hasText()) {
             switch (message.getText()) {
-                case MainMenuChatState.START : {
+                case "/start": {
                     sendMsg(
                         message,
                         "Привет! Я бот Чижик, буду летать за нужной тебе информацией! \n"
-                        + "Выбирай, что тебе хочется узнать, а я пока приготовлюсь  к полёту."
+                            + "Выбирай, что тебе хочется узнать, а я пока приготовлюсь  к полёту."
                     );
                     break;
-                } case MainMenuChatState.HELP : {
+                }
+                case "/help": {
                     sendMsg(
                         message,
                         "Чтобы я мог помочь тебе узнать нужную информацию - введи /start. \n"
-                        + "А для настроек есть команда /setting."
+                            + "А для настроек есть команда /setting."
                     );
-                    break;
-                } case MainMenuChatState.SETTING : {
+                }
+                case "/setting": {
                     sendMsg(message, "Что будем настраивать?");
                     break;
-                } default: {
-                    try {
-                        sendMsg(
-                            message,
-                            Weather.getWeather(
-                                message.getText(),
-                                model
-                            )
-                        );
-                    } catch (InterruptedException | FileNotFoundException e) {
-                        sendMsg(
-                            message,
-                            "Город не найден!"
-                        );
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                }
+                default: {
+                    chatStateMachineSet.get(message.getChatId()).update(message);
                 }
             }
         }
@@ -138,9 +117,9 @@ public class Bot extends TelegramLongPollingBot {
         List<KeyboardRow> keyboardRowList = new ArrayList<>();
         KeyboardRow keyboardFirstRow = new KeyboardRow();
 
-        keyboardFirstRow.add(new KeyboardButton(MainMenuChatState.START));
-        keyboardFirstRow.add(new KeyboardButton(MainMenuChatState.HELP));
-        keyboardFirstRow.add(new KeyboardButton(MainMenuChatState.SETTING));
+        keyboardFirstRow.add(new KeyboardButton("/start"));
+        keyboardFirstRow.add(new KeyboardButton("/help"));
+        keyboardFirstRow.add(new KeyboardButton("/setting"));
 
         keyboardRowList.add(keyboardFirstRow);
         replyKeyboardMarkup.setKeyboard(keyboardRowList);

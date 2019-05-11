@@ -1,19 +1,18 @@
 package ru.mail.polis.open.project.statemachine.states;
 
+import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 
 import java.util.List;
 
 public class NewsChatState implements ChatState {
 
-    public static final String NEWS = "News";
-
     public NewsChatState(List<String> cities) {
         // TODO: Draw User Interface displaying cities on buttons
     }
 
     @Override
-    public void update(ChatStateMachine stateMachine, String command) {
+    public void update(ChatStateMachine stateMachine, Message message) {
         // TODO: Implement this
     }
 }
