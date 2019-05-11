@@ -72,7 +72,9 @@ public class Bot extends TelegramLongPollingBot {
 
 
     public void onUpdateReceived(Update update) {
-        Model model = new Model();
+
+        // TODO: Call state machine
+
         Message message = update.getMessage();
         if (message != null && message.hasText()) {
             switch (message.getText()) {
@@ -89,13 +91,7 @@ public class Bot extends TelegramLongPollingBot {
                     break;
                 }
                 default: {
-                    try {
-                        sendMsg(message, Weather.getWeather(message.getText(), model));
-                    } catch (InterruptedException e) {
-                        sendMsg(message, "Город не найден!");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+
                 }
             }
         }
