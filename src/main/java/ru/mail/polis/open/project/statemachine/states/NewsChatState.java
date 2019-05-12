@@ -22,7 +22,6 @@ public class NewsChatState implements ChatState {
     private static final String URL_BEFORE_CITY_NAME = "https://news.rambler.ru/";
     private static final String RSS = "rss/";
     private static final byte LIMIT = 5;
-    private static FileWriter fw;
 
     private ChatStateMachine stateMachine;
 
@@ -41,14 +40,6 @@ public class NewsChatState implements ChatState {
                 )
             );
         }
-
-        if (fw == null) {
-            try {
-                fw = new FileWriter(new File("NewsRequests"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     @Override
@@ -59,12 +50,14 @@ public class NewsChatState implements ChatState {
             return;
         }
 
-        try {
+        try (FileWriter fw = new FileWriter(new File("NewsRequests.txt"),true)) {
             URL url = new URL(
                 URL_BEFORE_CITY_NAME
                 + RSS
                 + message.getText()
             );
+
+            LocalDateTime messageRequestTime = LocalDateTime.now();
 
             SyndFeedInput input = new SyndFeedInput();
             SyndFeed feed = input.build(new XmlReader(url));
@@ -99,7 +92,12 @@ public class NewsChatState implements ChatState {
                     + message.getChatId().toString()
                     + " : Request about News. City - "
                     + message.getText() + " at "
-                    + LocalDateTime.now()
+                    + messageRequestTime.getHour() + ":"
+                    + messageRequestTime.getMinute() + " "
+                    + messageRequestTime.getDayOfMonth() + "-"
+                    + messageRequestTime.getMonth().getValue() + "-"
+                    + messageRequestTime.getYear()
+                    + "\n"
             );
 
             Bot.getInstance().sendMsg(message, info.toString(), true);
