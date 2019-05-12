@@ -13,6 +13,12 @@ public class NewsChatState implements ChatState {
 
     @Override
     public void update(ChatStateMachine stateMachine, Message message) {
+
+        if (message.getText().equals("/toMainMenu")) {
+            stateMachine.setState(new MainMenuChatState());
+            return;
+        }
+
         // TODO: Implement this
     }
 }

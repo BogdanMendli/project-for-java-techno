@@ -87,19 +87,17 @@ public class Bot extends TelegramLongPollingBot {
                             + "Выбирай, что тебе хочется узнать, а я пока приготовлюсь  к полёту."
                     );
                     break;
-                }
-                case "/help": {
+                } case "/help": {
                     sendMsg(
                         message,
                         "Чтобы я мог помочь тебе узнать нужную информацию - введи /start. \n"
                             + "А для настроек есть команда /setting."
                     );
-                }
-                case "/setting": {
+                    break;
+                } case "/setting": {
                     sendMsg(message, "Что будем настраивать?");
                     break;
-                }
-                default: {
+                } default: {
                     chatStateMachineSet.get(message.getChatId()).update(message);
                 }
             }
@@ -120,6 +118,7 @@ public class Bot extends TelegramLongPollingBot {
         keyboardFirstRow.add(new KeyboardButton("/start"));
         keyboardFirstRow.add(new KeyboardButton("/help"));
         keyboardFirstRow.add(new KeyboardButton("/setting"));
+        keyboardFirstRow.add(new KeyboardButton("/toMainMenu"));
 
         keyboardRowList.add(keyboardFirstRow);
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
