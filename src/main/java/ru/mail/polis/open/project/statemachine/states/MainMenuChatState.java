@@ -23,11 +23,11 @@ public class MainMenuChatState implements ChatState {
                 );
                 break;
             } case "Weather" : {
-                Bot.getInstance().sendMsg(message, "В каком городе смотрим погоду?");
+//                Bot.getInstance().sendMsg(message, "В каком городе смотрим погоду?");
                 stateMachine.setState(new WeatherChatState(new ArrayList<>()));
                 break;
             } case "News" : {
-                Bot.getInstance().sendMsg(message, "В каком городе смотрим новости?");
+//                Bot.getInstance().sendMsg(message, "В каком городе смотрим новости?");
                 stateMachine.setState(new NewsChatState(new ArrayList<>()));
                 break;
             } default : {
