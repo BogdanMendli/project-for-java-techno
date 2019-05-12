@@ -39,7 +39,7 @@ public class WeatherChatState implements ChatState {
                 result.append(in.nextLine());
             }
 
-            JSONObject object = new JSONObject(result);
+            JSONObject object = new JSONObject(result.toString());
             JSONObject main = object.getJSONObject("main");
             JSONArray getArray = object.getJSONArray("weather");
 
