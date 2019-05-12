@@ -8,5 +8,5 @@ build
 *.class
 .DS_Store
 
-/NewsRequest
+/NewsRequests
 
