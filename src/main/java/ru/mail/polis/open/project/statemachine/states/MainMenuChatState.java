@@ -36,15 +36,17 @@ public class MainMenuChatState implements ChatState {
                 );
                 break;
             } case "Weather" : {
-//                Bot.getInstance().sendMsg(message, "В каком городе смотрим погоду?");
                 stateMachine.setState(new WeatherChatState(stateMachine, message));
                 break;
             } case "News" : {
-//                Bot.getInstance().sendMsg(message, "В каком городе смотрим новости?");
                 stateMachine.setState(new NewsChatState(stateMachine, message));
                 break;
             } default : {
-
+                Bot.getInstance().sendMsg(
+                    message,
+                    "У меня нет такой функции (",
+                    true
+                );
             }
         }
 

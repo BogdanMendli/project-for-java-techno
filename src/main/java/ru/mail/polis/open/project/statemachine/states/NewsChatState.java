@@ -22,8 +22,8 @@ public class NewsChatState implements ChatState {
     private static final String URL_BEFORE_CITY_NAME = "https://news.rambler.ru/";
     private static final String RSS = "rss/";
     private static final byte LIMIT = 5;
+    private static FileWriter fw;
 
-    private final File file = new File("News Requests");
     private ChatStateMachine stateMachine;
 
     public NewsChatState(ChatStateMachine stateMachine, Message message) {
@@ -41,6 +41,14 @@ public class NewsChatState implements ChatState {
                 )
             );
         }
+
+        if (fw == null) {
+            try {
+                fw = new FileWriter(new File("NewsRequests"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -51,7 +59,7 @@ public class NewsChatState implements ChatState {
             return;
         }
 
-        try (FileWriter fw = new FileWriter(file)) {
+        try {
             URL url = new URL(
                 URL_BEFORE_CITY_NAME
                 + RSS
@@ -87,18 +95,19 @@ public class NewsChatState implements ChatState {
                 .append(message.getText());
 
             fw.write(
-                message.getChatId().toString()
-                + " : Request about News. City - "
-                + message.getText() + " at "
-                + LocalDateTime.now()
+                "chatId : "
+                    + message.getChatId().toString()
+                    + " : Request about News. City - "
+                    + message.getText() + " at "
+                    + LocalDateTime.now()
             );
+
             Bot.getInstance().sendMsg(message, info.toString(), true);
         } catch (MalformedURLException e) {
             Bot.getInstance().sendMsg(message, "Город не найден!", true);
         } catch (FeedException | IOException e) {
             e.printStackTrace();
         }
-
         // TODO: Implement this
     }
 }
