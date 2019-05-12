@@ -1,11 +1,10 @@
-package ru.mail.polis.open.project.statemachine;
+package ru.mail.polis.open.project;
 
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.ApiContext;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
-import ru.mail.polis.open.project.Bot;
 
 public class BotCreator {
 
