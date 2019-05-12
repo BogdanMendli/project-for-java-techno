@@ -127,7 +127,7 @@ public class Bot extends TelegramLongPollingBot {
                     break;
                 }
                 case "News" : {
-                    stateMachine.setState(new NewsChatState(stateMachine, null));
+                    stateMachine.setState(new NewsChatState(stateMachine, update.getCallbackQuery().getMessage()));
                     break;
                 }
                 default: {

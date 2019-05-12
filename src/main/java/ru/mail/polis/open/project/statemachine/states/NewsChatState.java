@@ -6,14 +6,15 @@ import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import ru.mail.polis.open.project.Bot;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
+import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 
 public class NewsChatState implements ChatState {
 
@@ -21,8 +22,6 @@ public class NewsChatState implements ChatState {
     private static final byte LIMIT = 10;
 
     private final File file = new File("News Requests");
-
-    public NewsChatState(List<String> cities) {
     private ChatStateMachine stateMachine;
 
     public NewsChatState(ChatStateMachine stateMachine, Message message) {
@@ -43,7 +42,7 @@ public class NewsChatState implements ChatState {
     public void update(Message message) {
 
         if (message.getText().equals("/toMainMenu")) {
-            stateMachine.setState(new MainMenuChatState());
+            stateMachine.setState(new MainMenuChatState(stateMachine, message));
             return;
         }
 
@@ -72,9 +71,9 @@ public class NewsChatState implements ChatState {
             }
 
             fw.write(info.toString());
-            Bot.getInstance().sendMsg(message, info.toString());
+            Bot.getInstance().sendMsg(message, info.toString(), true);
         } catch (MalformedURLException e) {
-            Bot.getInstance().sendMsg(message, "Город не найден!");
+            Bot.getInstance().sendMsg(message, "Город не найден!", true);
         } catch (FeedException | IOException e) {
             e.printStackTrace();
         }
