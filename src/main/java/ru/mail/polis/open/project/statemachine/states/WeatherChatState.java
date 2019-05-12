@@ -51,7 +51,7 @@ public class WeatherChatState implements ChatState {
                     "Осадки: " + getArray.getJSONObject(0).get("main") + "\n" +
                     "http://openweathermap.org/img/w/" + getArray.getJSONObject(0).get("main") + ".png");
         } catch (MalformedURLException e) {
-            Bot.getInstance().sendMsg(message, "Города не найдено!");
+            Bot.getInstance().sendMsg(message, "Город не найден!");
         } catch (IOException e) {
             Bot.getInstance().sendMsg(message, "Что-то пошло не так :(");
         }
