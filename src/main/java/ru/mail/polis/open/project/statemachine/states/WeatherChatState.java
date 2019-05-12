@@ -15,8 +15,8 @@ import java.util.Scanner;
 
 public class WeatherChatState implements ChatState {
 
-    private static final String urlBeforeCityName = "http://api.openweathermap.org/data/2.5/weather?q=";
-    private static final String urlAfterCityName = "&units=metric&appid=6fff53a641b9b9a799cfd6b079f5cd4e";
+    private static final String URL_BEFORE_CITY_NAME = "http://api.openweathermap.org/data/2.5/weather?q=";
+    private static final String URL_AFTER_CITY_NAME = "&units=metric&appid=6fff53a641b9b9a799cfd6b079f5cd4e";
     private final ChatStateMachine stateMachine;
 
     public WeatherChatState(ChatStateMachine stateMachine, Message message) {
@@ -42,7 +42,7 @@ public class WeatherChatState implements ChatState {
         }
 
         try {
-            URL url = new URL(urlBeforeCityName + message.getText() + urlAfterCityName);
+            URL url = new URL(URL_BEFORE_CITY_NAME + message.getText() + URL_AFTER_CITY_NAME);
 
             Scanner in = new Scanner((InputStream) url.getContent());
             StringBuilder result = new StringBuilder();
