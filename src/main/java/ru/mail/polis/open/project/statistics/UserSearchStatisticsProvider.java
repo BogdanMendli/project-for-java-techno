@@ -1,5 +1,6 @@
 package ru.mail.polis.open.project.statistics;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +23,11 @@ public class UserSearchStatisticsProvider {
     }
 
     public void onWeatherSearch(String city) {
-        citiesWeatherSearchCounter.compute(city, (key, oldValue) -> oldValue == null ? 1 : oldValue++);
+        citiesWeatherSearchCounter.compute(city, (key, oldValue) -> oldValue == null ? 1 : oldValue + 1);
     }
 
     public void onNewsSearch(String city) {
-        citiesNewsSearchCounter.compute(city, (key, oldValue) -> oldValue == null ? 1 : oldValue++);
+        citiesNewsSearchCounter.compute(city, (key, oldValue) -> oldValue == null ? 1 : oldValue + 1);
     }
 
     public List<String> getMostFrequent(int count, StatisticsMode mode) {
@@ -48,7 +49,7 @@ public class UserSearchStatisticsProvider {
         return requiredMap
             .entrySet()
             .stream()
-            .sorted()
+            .sorted(((o1, o2) -> o2.getValue().compareTo(o1.getValue())))
             .limit(count)
             .map(Map.Entry::getKey)
             .collect(Collectors.toList());
