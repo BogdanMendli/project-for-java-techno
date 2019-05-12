@@ -5,11 +5,15 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
+import ru.mail.polis.open.project.statemachine.states.NewsChatState;
+import ru.mail.polis.open.project.statemachine.states.WeatherChatState;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,18 +45,26 @@ public class Bot extends TelegramLongPollingBot {
         return instance;
     }
 
-    public void sendMsg(Message message, String text) {
+    public void sendMsg(Message message, String text, boolean replyRequired) {
+
+        sendMsg(message, text, replyRequired, List.of());
+    }
+
+    public void sendMsg(Message message, String text, boolean replyRequired, List<String> buttonsNames) {
+
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
 
         sendMessage.setChatId(message.getChatId().toString());
 
-        sendMessage.setReplyToMessageId(message.getMessageId());
+        if (replyRequired) {
+            sendMessage.setReplyToMessageId(message.getMessageId());
+        }
 
         sendMessage.setText(text);
         try {
-
-            setButtons(sendMessage);
+            setMessageButtons(sendMessage, buttonsNames);
+            //setChatButtons(sendMessage);
             execute(sendMessage);
 
         } catch (TelegramApiException e) {
@@ -64,48 +76,85 @@ public class Bot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
 
         // TODO: Call state machine
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            Message message = update.getMessage();
 
-        Message message = update.getMessage();
+            if (message == null) {
+                return;
+            }
 
-        if (message == null) {
-            return;
-        }
+            if (!chatStateMachineSet.containsKey(message.getChatId())) {
+                chatStateMachineSet.put(
+                    message.getChatId(),
+                    new ChatStateMachine()
+                );
+            }
 
-        if (!chatStateMachineSet.containsKey(message.getChatId())) {
-            chatStateMachineSet.put(
-                message.getChatId(),
-                new ChatStateMachine()
-            );
-        }
-
-        if (message.hasText()) {
-            switch (message.getText()) {
-                case "/start": {
-                    sendMsg(
-                        message,
-                        "Привет! Я бот Чижик, буду летать за нужной тебе информацией! \n"
-                            + "Выбирай, что тебе хочется узнать, а я пока приготовлюсь  к полёту."
-                    );
+            if (message.hasText()) {
+                switch (message.getText()) {
+                    case "/start": {
+                        sendMsg(
+                            message,
+                            "Привет! Я бот Чижик, буду летать за нужной тебе информацией! \n"
+                                + "Выбирай, что тебе хочется узнать, а я пока приготовлюсь  к полёту.",
+                            true
+                        );
+                        break;
+                    }
+                    case "/help": {
+                        sendMsg(
+                            message,
+                            "Чтобы я мог помочь тебе узнать нужную информацию - введи /start. \n"
+                                + "А для настроек есть команда /setting.",
+                            true
+                        );
+                        break;
+                    }
+                    case "/setting": {
+                        sendMsg(message, "Что будем настраивать?", true);
+                        break;
+                    }
+                    default: {
+                        chatStateMachineSet.get(message.getChatId()).update(message);
+                    }
+                }
+            }
+        } else if (update.hasCallbackQuery()) {
+            ChatStateMachine stateMachine = chatStateMachineSet.get(update.getCallbackQuery().getMessage().getChatId());
+            switch (update.getCallbackQuery().getData()) {
+                case "Weather" : {
+                    stateMachine.setState(new WeatherChatState(stateMachine, update.getCallbackQuery().getMessage()));
                     break;
-                } case "/help": {
-                    sendMsg(
-                        message,
-                        "Чтобы я мог помочь тебе узнать нужную информацию - введи /start. \n"
-                            + "А для настроек есть команда /setting."
-                    );
+                }
+                case "News" : {
+                    stateMachine.setState(new NewsChatState(stateMachine, update.getCallbackQuery().getMessage()));
                     break;
-                } case "/setting": {
-                    sendMsg(message, "Что будем настраивать?");
-                    break;
-                } default: {
-                    chatStateMachineSet.get(message.getChatId()).update(message);
+                }
+                default: {
+                    stateMachine.update(update.getCallbackQuery().getMessage());
                 }
             }
         }
     }
 
 
-    public void setButtons(SendMessage sendMessage) {
+    private void setMessageButtons(SendMessage sendMessage, List<String> buttonsNames) {
+
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        sendMessage.setReplyMarkup(inlineKeyboardMarkup);
+
+        List<List<InlineKeyboardButton>> inlineButtons = new ArrayList<>();
+
+        for (String buttonsName : buttonsNames) {
+            inlineButtons.add(List.of(new InlineKeyboardButton(buttonsName).setCallbackData(buttonsName)));
+        }
+
+        inlineKeyboardMarkup.setKeyboard(inlineButtons);
+    }
+
+
+    public void setChatButtons(SendMessage sendMessage) {
+
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         sendMessage.setReplyMarkup(replyKeyboardMarkup);
         replyKeyboardMarkup.setSelective(true);
