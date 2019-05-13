@@ -15,13 +15,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDateTime;
 
 public class NewsChatState implements ChatState {
 
-    private static final String urlBeforeCityName = "https://news.rambler.ru/rss/";
-    private static final byte LIMIT = 10;
+    private static final String URL_BEFORE_CITY_NAME = "https://news.rambler.ru/";
+    private static final String RSS = "rss/";
+    private static final byte LIMIT = 5;
 
-    private final File file = new File("News Requests");
     private ChatStateMachine stateMachine;
 
     public NewsChatState(ChatStateMachine stateMachine, Message message) {
@@ -33,7 +34,10 @@ public class NewsChatState implements ChatState {
                 message,
                 "Введите город",
                 false,
-                stateMachine.getStatisticsProvider().getMostFrequent(4, UserSearchStatisticsProvider.StatisticsMode.NEWS)
+                stateMachine.getStatisticsProvider().getMostFrequent(
+                    4,
+                    UserSearchStatisticsProvider.StatisticsMode.NEWS
+                )
             );
         }
     }
@@ -46,8 +50,14 @@ public class NewsChatState implements ChatState {
             return;
         }
 
-        try (FileWriter fw = new FileWriter(file)) {
-            URL url = new URL(urlBeforeCityName + message.getText());
+        try (FileWriter fw = new FileWriter(new File("NewsRequests.txt"),true)) {
+            URL url = new URL(
+                URL_BEFORE_CITY_NAME
+                + RSS
+                + message.getText()
+            );
+
+            LocalDateTime messageRequestTime = LocalDateTime.now();
 
             SyndFeedInput input = new SyndFeedInput();
             SyndFeed feed = input.build(new XmlReader(url));
@@ -56,28 +66,46 @@ public class NewsChatState implements ChatState {
 
             for (SyndEntry entry : feed.getEntries()) {
                 info.append(
-                    (entry.getTitle() != null
+                        (entry.getTitle() != null
                         ? "  Topic #" + ++currentNews + " : " + entry.getTitle()
-                        : "title : NULL") + "\n\n"
-                        + (entry.getDescription() != null
+                        : "title : NULL")
+                    )
+                    .append("\n\n")
+                    .append(
+                        entry.getDescription() != null
                         ? entry.getDescription().getValue()
-                        : "description : NULL") + "\n\n"
-                        + "-----------------------------" + "\n\n"
-                );
+                        : "description : NULL"
+                    )
+                    .append("\n\n---------------------------------------------------------\n\n");
 
                 if (currentNews == LIMIT) {
                     break;
                 }
             }
 
-            fw.write(info.toString());
+            info.append("Source : ")
+                .append(URL_BEFORE_CITY_NAME)
+                .append(message.getText());
+
+            fw.write(
+                "chatId : "
+                    + message.getChatId().toString()
+                    + " : Request about News. City - "
+                    + message.getText() + " at "
+                    + messageRequestTime.getHour() + ":"
+                    + messageRequestTime.getMinute() + " "
+                    + messageRequestTime.getDayOfMonth() + "-"
+                    + messageRequestTime.getMonth().getValue() + "-"
+                    + messageRequestTime.getYear()
+                    + "\n"
+            );
+
             Bot.getInstance().sendMsg(message, info.toString(), true);
         } catch (MalformedURLException e) {
             Bot.getInstance().sendMsg(message, "Город не найден!", true);
         } catch (FeedException | IOException e) {
             e.printStackTrace();
         }
-
         // TODO: Implement this
     }
 }

@@ -171,7 +171,6 @@ public class Bot extends TelegramLongPollingBot {
 
         keyboardRowList.add(keyboardFirstRow);
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
-
     }
 
     public String getBotUsername() {
