@@ -27,7 +27,7 @@ public class Bot extends TelegramLongPollingBot {
     private final Map<Long, ChatStateMachine> chatStateMachineSet;
 
     private static Bot instance = null;
-    private static ExecutorService executorService = Executors.newFixedThreadPool(100);
+    private static ExecutorService executorService = Executors.newFixedThreadPool(8);
 
     protected Bot(DefaultBotOptions botOptions) {
         super(botOptions);
@@ -53,7 +53,12 @@ public class Bot extends TelegramLongPollingBot {
         sendMsg(message, text, replyRequired, List.of());
     }
 
-    public void sendMsg(Message message, String text, boolean replyRequired, List<String> buttonsNames) {
+    public void sendMsg(
+        Message message,
+        String text,
+        boolean replyRequired,
+        List<String> buttonsNames
+    ) {
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
@@ -79,74 +84,78 @@ public class Bot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
 
         // TODO: Call state machine
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            Message message = update.getMessage();
+        executorService.submit(() -> {
+                if (update.hasMessage() && update.getMessage().hasText()) {
+                    Message message = update.getMessage();
 
-            if (message == null) {
-                return;
-            }
+                    if (message == null) {
+                        return;
+                    }
 
-            if (!chatStateMachineSet.containsKey(message.getChatId())) {
-                chatStateMachineSet.put(
-                    message.getChatId(),
-                    new ChatStateMachine()
-                );
-            }
+                    if (!chatStateMachineSet.containsKey(message.getChatId())) {
+                        chatStateMachineSet.put(
+                            message.getChatId(),
+                            new ChatStateMachine()
+                        );
+                    }
 
-            if (message.hasText()) {
-                switch (message.getText()) {
-                    case "/start": {
-                        executorService.submit(
-                            () -> sendMsg(
-                                message,
-                                "Привет! Я бот Чижик, буду летать за нужной тебе информацией! \n"
-                                    + "Выбирай, что тебе хочется узнать, а я пока приготовлюсь  к полёту.",
-                                true
-                            )
-                        );
-                        break;
-                    } case "/help": {
-                        executorService.submit(
-                            () -> sendMsg(
-                                message,
-                                "Чтобы я мог помочь тебе узнать нужную информацию - введи /start. \n"
-                                    + "А для настроек есть команда /setting.",
-                                true
-                            )
-                        );
-                        break;
-                    } case "/setting": {
-                        executorService.submit(
-                            () -> sendMsg(
-                                message,
-                                "Что будем настраивать?",
-                                true
-                            )
-                        );
-                        break;
-                    } default: {
-                        executorService.submit(
-                            () -> chatStateMachineSet.get(message.getChatId()).update(message)
-                        );
+                    if (message.hasText()) {
+                        switch (message.getText()) {
+                            case "/start": {
+                                sendMsg(
+                                    message,
+                                    "Привет! Я бот Чижик, буду летать за нужной тебе информацией! \n"
+                                        + "Выбирай, что тебе хочется узнать, а я пока приготовлюсь  к полёту.",
+                                    false,
+                                    List.of("Weather", "News")
+                                );
+                                break;
+                            } case "/help": {
+                                sendMsg(
+                                    message,
+                                    "Чтобы я мог помочь тебе узнать нужную информацию - введи /start. \n"
+                                        + "А для настроек есть команда /setting.",
+                                    true
+                                );
+                                break;
+                            } case "/setting": {
+                                sendMsg(
+                                    message,
+                                    "Что будем настраивать?",
+                                    true
+                                );
+                                break;
+                            } default: {
+                                chatStateMachineSet.get(message.getChatId()).update(message);
+                            }
+                        }
+                    }
+                } else if (update.hasCallbackQuery()) {
+                    ChatStateMachine stateMachine = chatStateMachineSet.get(
+                        update.getCallbackQuery().getMessage().getChatId()
+                    );
+                    switch (update.getCallbackQuery().getData()) {
+                        case "Weather": {
+                            stateMachine.setState(
+                                new WeatherChatState(stateMachine,
+                                    update.getCallbackQuery().getMessage())
+                            );
+                            break;
+                        } case "News": {
+                            stateMachine.setState(new NewsChatState(
+                                stateMachine,
+                                update.getCallbackQuery().getMessage())
+                            );
+                            break;
+                        } default: {
+                            stateMachine.update(
+                                update.getCallbackQuery().getMessage()
+                            );
+                        }
                     }
                 }
             }
-        } else if (update.hasCallbackQuery()) {
-            ChatStateMachine stateMachine = chatStateMachineSet.get(update.getCallbackQuery().getMessage().getChatId());
-            switch (update.getCallbackQuery().getData()) {
-                case "Weather" : {
-                    stateMachine.setState(new WeatherChatState(stateMachine, update.getCallbackQuery().getMessage()));
-                    break;
-                }
-                case "News" : {
-                    stateMachine.setState(new NewsChatState(stateMachine, update.getCallbackQuery().getMessage()));
-                    break;
-                }
-                default: {
-                    stateMachine.update(update.getCallbackQuery().getMessage());
-                }
-            }
-        }
+        );
     }
 
 
@@ -158,7 +167,9 @@ public class Bot extends TelegramLongPollingBot {
         List<List<InlineKeyboardButton>> inlineButtons = new ArrayList<>();
 
         for (String buttonsName : buttonsNames) {
-            inlineButtons.add(List.of(new InlineKeyboardButton(buttonsName).setCallbackData(buttonsName)));
+            inlineButtons.add(List.of(
+                new InlineKeyboardButton(buttonsName).setCallbackData(buttonsName))
+            );
         }
 
         inlineKeyboardMarkup.setKeyboard(inlineButtons);
@@ -175,13 +186,15 @@ public class Bot extends TelegramLongPollingBot {
 
         List<KeyboardRow> keyboardRowList = new ArrayList<>();
         KeyboardRow keyboardFirstRow = new KeyboardRow();
+        KeyboardRow keyboardSecondRow = new KeyboardRow();
 
         keyboardFirstRow.add(new KeyboardButton("/start"));
         keyboardFirstRow.add(new KeyboardButton("/help"));
-        keyboardFirstRow.add(new KeyboardButton("/setting"));
-        keyboardFirstRow.add(new KeyboardButton("/toMainMenu"));
+        keyboardSecondRow.add(new KeyboardButton("/setting"));
+        keyboardSecondRow.add(new KeyboardButton("/toMainMenu"));
 
         keyboardRowList.add(keyboardFirstRow);
+        keyboardRowList.add(keyboardSecondRow);
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
     }
 

@@ -28,7 +28,10 @@ public class WeatherChatState implements ChatState {
                 message,
                 "Введите город",
                 false,
-                stateMachine.getStatisticsProvider().getMostFrequent(4, UserSearchStatisticsProvider.StatisticsMode.WEATHER)
+                stateMachine.getStatisticsProvider().getMostFrequent(
+                    4,
+                    UserSearchStatisticsProvider.StatisticsMode.WEATHER
+                )
             );
         }
     }
@@ -62,9 +65,13 @@ public class WeatherChatState implements ChatState {
                     "Температура: " + main.getDouble("temp") + "C" + "\n" +
                     "Влажность: " + main.getDouble("humidity") + "%" + "\n" +
                     "Осадки: " + getArray.getJSONObject(0).get("main") + "\n" +
-                    "http://openweathermap.org/img/w/" + getArray.getJSONObject(0).get("main") + ".png",
+                    "http://openweathermap.org/img/w/" + getArray.getJSONObject(0).get("icon") + ".png",
                 true,
-                stateMachine.getStatisticsProvider().getMostFrequent(4, UserSearchStatisticsProvider.StatisticsMode.WEATHER));
+                stateMachine.getStatisticsProvider().getMostFrequent(
+                    4,
+                    UserSearchStatisticsProvider.StatisticsMode.WEATHER
+                )
+            );
         } catch (MalformedURLException e) {
             Bot.getInstance().sendMsg(message, "Город не найден!", true);
         } catch (IOException e) {
