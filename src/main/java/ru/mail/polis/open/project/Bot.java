@@ -19,12 +19,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Bot extends TelegramLongPollingBot {
 
     private final Map<Long, ChatStateMachine> chatStateMachineSet;
 
     private static Bot instance = null;
+    private static ExecutorService executorService = Executors.newFixedThreadPool(100);
 
     protected Bot(DefaultBotOptions botOptions) {
         super(botOptions);
@@ -64,7 +67,7 @@ public class Bot extends TelegramLongPollingBot {
         sendMessage.setText(text);
         try {
             setMessageButtons(sendMessage, buttonsNames);
-            //setChatButtons(sendMessage);
+            setChatButtons(sendMessage);
             execute(sendMessage);
 
         } catch (TelegramApiException e) {
@@ -93,29 +96,38 @@ public class Bot extends TelegramLongPollingBot {
             if (message.hasText()) {
                 switch (message.getText()) {
                     case "/start": {
-                        sendMsg(
-                            message,
-                            "Привет! Я бот Чижик, буду летать за нужной тебе информацией! \n"
-                                + "Выбирай, что тебе хочется узнать, а я пока приготовлюсь  к полёту.",
-                            true
+                        executorService.submit(
+                            () -> sendMsg(
+                                message,
+                                "Привет! Я бот Чижик, буду летать за нужной тебе информацией! \n"
+                                    + "Выбирай, что тебе хочется узнать, а я пока приготовлюсь  к полёту.",
+                                true
+                            )
                         );
                         break;
-                    }
-                    case "/help": {
-                        sendMsg(
-                            message,
-                            "Чтобы я мог помочь тебе узнать нужную информацию - введи /start. \n"
-                                + "А для настроек есть команда /setting.",
-                            true
+                    } case "/help": {
+                        executorService.submit(
+                            () -> sendMsg(
+                                message,
+                                "Чтобы я мог помочь тебе узнать нужную информацию - введи /start. \n"
+                                    + "А для настроек есть команда /setting.",
+                                true
+                            )
                         );
                         break;
-                    }
-                    case "/setting": {
-                        sendMsg(message, "Что будем настраивать?", true);
+                    } case "/setting": {
+                        executorService.submit(
+                            () -> sendMsg(
+                                message,
+                                "Что будем настраивать?",
+                                true
+                            )
+                        );
                         break;
-                    }
-                    default: {
-                        chatStateMachineSet.get(message.getChatId()).update(message);
+                    } default: {
+                        executorService.submit(
+                            () -> chatStateMachineSet.get(message.getChatId()).update(message)
+                        );
                     }
                 }
             }
