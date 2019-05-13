@@ -26,7 +26,7 @@ public class WeatherChatState implements ChatState {
         if (message != null) {
             Bot.getInstance().sendMsg(
                 message,
-                "Введите город",
+                "Введите город на английском",
                 false,
                 stateMachine.getStatisticsProvider().getMostFrequent(
                     4,
