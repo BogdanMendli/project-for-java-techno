@@ -72,7 +72,7 @@ public class Bot extends TelegramLongPollingBot {
         sendMessage.setText(text);
         try {
             setMessageButtons(sendMessage, buttonsNames);
-            setChatButtons(sendMessage);
+//            setChatButtons(sendMessage);
             execute(sendMessage);
 
         } catch (TelegramApiException e) {
