@@ -48,9 +48,17 @@ public class Bot extends TelegramLongPollingBot {
         return instance;
     }
 
-    public void sendMsg(Message message, String text, boolean replyRequired) {
-
-        sendMsg(message, text, replyRequired, List.of());
+    public void sendMsg(
+        Message message,
+        String text,
+        boolean replyRequired
+    ) {
+        sendMsg(
+            message,
+            text,
+            replyRequired,
+            List.of()
+        );
     }
 
     public void sendMsg(
@@ -59,7 +67,6 @@ public class Bot extends TelegramLongPollingBot {
         boolean replyRequired,
         List<String> buttonsNames
     ) {
-
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
 
@@ -72,7 +79,11 @@ public class Bot extends TelegramLongPollingBot {
         sendMessage.setText(text);
         try {
 //            setChatButtons(sendMessage);
-            setMessageButtons(sendMessage, buttonsNames);
+            setMessageButtons(
+                sendMessage,
+                buttonsNames
+            );
+
             execute(sendMessage);
 
         } catch (TelegramApiException e) {

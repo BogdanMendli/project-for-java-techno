@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.Scanner;
 
 public class WeatherChatState implements ChatState {
@@ -41,7 +40,12 @@ public class WeatherChatState implements ChatState {
     public void update(Message message) {
 
         if (message.getText().equals("/toMainMenu")) {
-            stateMachine.setState(new MainMenuChatState(stateMachine, message));
+            stateMachine.setState(
+                new MainMenuChatState(
+                    stateMachine,
+                    message
+                )
+            );
             return;
         }
 

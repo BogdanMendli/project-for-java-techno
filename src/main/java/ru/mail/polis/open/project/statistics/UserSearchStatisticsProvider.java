@@ -7,9 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.BufferOverflowException;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +22,7 @@ public class UserSearchStatisticsProvider {
 
     private final Map<String, Integer> citiesWeatherSearchCounter;
     private final Map<String, Integer> citiesNewsSearchCounter;
-    public static FileWriter fw;
+    private static FileWriter fw;
     private static File file;
     private static int countTakenStatistic;
 
@@ -34,7 +32,8 @@ public class UserSearchStatisticsProvider {
         citiesWeatherSearchCounter = new HashMap<>();
         countTakenStatistic = 0;
         try {
-            file = new File("Statistic-" + countTakenStatistic + ".txt");
+            file = new File(
+                "Statistic-" + countTakenStatistic + ".txt");
             fw = new FileWriter(file, true);
         } catch (IOException e) {
             e.printStackTrace();
@@ -42,11 +41,17 @@ public class UserSearchStatisticsProvider {
     }
 
     public void onWeatherSearch(String city) {
-        citiesWeatherSearchCounter.compute(city, (key, oldValue) -> oldValue == null ? 1 : oldValue + 1);
+        citiesWeatherSearchCounter.compute(
+            city,
+            (key, oldValue) -> oldValue == null ? 1 : oldValue + 1
+        );
     }
 
     public void onNewsSearch(String city) {
-        citiesNewsSearchCounter.compute(city, (key, oldValue) -> oldValue == null ? 1 : oldValue + 1);
+        citiesNewsSearchCounter.compute(
+            city,
+            (key, oldValue) -> oldValue == null ? 1 : oldValue + 1
+        );
     }
 
     public static void addInfoAboutRequest(Message message, String opportunity) {

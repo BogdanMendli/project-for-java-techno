@@ -36,10 +36,20 @@ public class MainMenuChatState implements ChatState {
                 );
                 break;
             } case "Weather" : {
-                stateMachine.setState(new WeatherChatState(stateMachine, message));
+                stateMachine.setState(
+                    new WeatherChatState(
+                        stateMachine,
+                        message
+                    )
+                );
                 break;
             } case "News" : {
-                stateMachine.setState(new NewsChatState(stateMachine, message));
+                stateMachine.setState(
+                    new NewsChatState(
+                        stateMachine,
+                        message
+                    )
+                );
                 break;
             } default : {
                 Bot.getInstance().sendMsg(
@@ -49,7 +59,5 @@ public class MainMenuChatState implements ChatState {
                 );
             }
         }
-
-        // TODO: Implement this
     }
 }

@@ -10,12 +10,9 @@ import ru.mail.polis.open.project.Bot;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.LocalDateTime;
 
 public class NewsChatState implements ChatState {
 
@@ -46,7 +43,12 @@ public class NewsChatState implements ChatState {
     public void update(Message message) {
 
         if (message.getText().equals("/toMainMenu")) {
-            stateMachine.setState(new MainMenuChatState(stateMachine, message));
+            stateMachine.setState(
+                new MainMenuChatState(
+                    stateMachine,
+                    message
+                )
+            );
             return;
         }
 
@@ -85,14 +87,24 @@ public class NewsChatState implements ChatState {
                 .append(URL_BEFORE_CITY_NAME)
                 .append(message.getText());
 
-            UserSearchStatisticsProvider.addInfoAboutRequest(message, "News");
+            UserSearchStatisticsProvider.addInfoAboutRequest(
+                message,
+                "News"
+            );
 
-            Bot.getInstance().sendMsg(message, info.toString(), true);
+            Bot.getInstance().sendMsg(
+                message,
+                info.toString(),
+                true
+            );
         } catch (MalformedURLException e) {
-            Bot.getInstance().sendMsg(message, "Город не найден!", true);
+            Bot.getInstance().sendMsg(
+                message,
+                "Город не найден!",
+                true
+            );
         } catch (FeedException | IOException e) {
             e.printStackTrace();
         }
-        // TODO: Implement this
     }
 }
