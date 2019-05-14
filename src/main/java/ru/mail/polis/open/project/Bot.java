@@ -71,8 +71,8 @@ public class Bot extends TelegramLongPollingBot {
 
         sendMessage.setText(text);
         try {
-            setMessageButtons(sendMessage, buttonsNames);
 //            setChatButtons(sendMessage);
+            setMessageButtons(sendMessage, buttonsNames);
             execute(sendMessage);
 
         } catch (TelegramApiException e) {
@@ -113,8 +113,9 @@ public class Bot extends TelegramLongPollingBot {
                             } case "/help": {
                                 sendMsg(
                                     message,
-                                    "Чтобы я мог помочь тебе узнать нужную информацию - введи /start. \n"
-                                        + "А для настроек есть команда /setting.",
+                                    "Чтобы я мог помочь тебе узнать нужную информацию - введи /start.\n"
+                                        + "Команда для настроек - /setting.\n"
+                                        + "Чтобы вернуться в главное меню используй команду /toMainMenu",
                                     true
                                 );
                                 break;

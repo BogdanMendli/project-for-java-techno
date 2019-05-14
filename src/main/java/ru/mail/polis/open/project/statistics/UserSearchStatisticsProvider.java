@@ -1,5 +1,14 @@
 package ru.mail.polis.open.project.statistics;
 
+import org.telegram.telegrambots.meta.api.objects.Message;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.BufferOverflowException;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -15,11 +24,21 @@ public class UserSearchStatisticsProvider {
 
     private final Map<String, Integer> citiesWeatherSearchCounter;
     private final Map<String, Integer> citiesNewsSearchCounter;
+    public static FileWriter fw;
+    private static File file;
+    private static int countTakenStatistic;
 
     public UserSearchStatisticsProvider() {
 
         citiesNewsSearchCounter = new HashMap<>();
         citiesWeatherSearchCounter = new HashMap<>();
+        countTakenStatistic = 0;
+        try {
+            file = new File("Statistic-" + countTakenStatistic + ".txt");
+            fw = new FileWriter(file, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void onWeatherSearch(String city) {
@@ -30,20 +49,40 @@ public class UserSearchStatisticsProvider {
         citiesNewsSearchCounter.compute(city, (key, oldValue) -> oldValue == null ? 1 : oldValue + 1);
     }
 
+    public static void addInfoAboutRequest(Message message, String opportunity) {
+        LocalDateTime messageRequestTime = LocalDateTime.now();
+
+        try {
+            UserSearchStatisticsProvider.fw.write(
+                "chatId : "
+                    + message.getChatId().toString()
+                    + " : Request about " + opportunity + ". City - "
+                    + message.getText() + " at "
+                    + messageRequestTime.getHour() + ":"
+                    + messageRequestTime.getMinute() + " "
+                    + messageRequestTime.getDayOfMonth() + "-"
+                    + messageRequestTime.getMonth().getValue() + "-"
+                    + messageRequestTime.getYear()
+                    + "\n"
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public List<String> getMostFrequent(int count, StatisticsMode mode) {
 
         Map<String, Integer> requiredMap;
-
         switch (mode) {
             case WEATHER: {
                 requiredMap = citiesWeatherSearchCounter;
                 break;
-            }
-            case NEWS: {
+            } case NEWS: {
                 requiredMap = citiesNewsSearchCounter;
                 break;
+            } default: {
+                throw new IllegalArgumentException("No such statistics mode");
             }
-            default: throw new IllegalArgumentException("No such statistics mode");
         }
 
         return requiredMap
@@ -53,6 +92,28 @@ public class UserSearchStatisticsProvider {
             .limit(count)
             .map(Map.Entry::getKey)
             .collect(Collectors.toList());
+    }
+
+    public static File getCurrentStatistic() {
+
+        File currentFile = file;
+        try {
+            fw.close();
+            BufferedReader br = new BufferedReader(new FileReader(currentFile));
+            file = new File("Statistic-" + ++countTakenStatistic + ".txt");
+            fw = new FileWriter(file);
+            br.lines().forEach((line) -> {
+                try {
+                    fw.write(line);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return currentFile;
     }
 
     public void clear() {

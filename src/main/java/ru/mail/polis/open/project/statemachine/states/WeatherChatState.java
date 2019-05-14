@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 public class WeatherChatState implements ChatState {
@@ -72,6 +73,8 @@ public class WeatherChatState implements ChatState {
                     UserSearchStatisticsProvider.StatisticsMode.WEATHER
                 )
             );
+
+            UserSearchStatisticsProvider.addInfoAboutRequest(message, "Weather");
         } catch (MalformedURLException e) {
             Bot.getInstance().sendMsg(message, "Город не найден!", true);
         } catch (IOException e) {
