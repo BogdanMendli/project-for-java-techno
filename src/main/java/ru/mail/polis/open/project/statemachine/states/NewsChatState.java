@@ -5,6 +5,7 @@ import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
+import ru.mail.polis.open.project.Bot;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
 
@@ -26,9 +27,12 @@ public class NewsChatState implements ChatState {
     }
 
     @Override
-    public String update(String message, long chatId, List<String> buttonsNames) {
-
-        if (message.equals("/toMainMenu")) {
+    public String update(
+        String message,
+        long chatId,
+        List<String> buttonsNames
+    ) {
+        if (message.equals(Bot.TO_MAIN_MENU_BUTTON)) {
             stateMachine.setState(new MainMenuChatState(stateMachine));
 
             return null;
@@ -76,7 +80,11 @@ public class NewsChatState implements ChatState {
             );
 
             stateMachine.getStatisticsProvider().onNewsSearch(message);
-            UserSearchStatisticsProvider.addInfoAboutRequest(message, chatId, "News");
+            UserSearchStatisticsProvider.addInfoAboutRequest(
+                message,
+                chatId,
+                "News"
+            );
 
             buttonsNames.addAll(getMostFrequentCities());
 

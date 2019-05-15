@@ -2,6 +2,7 @@ package ru.mail.polis.open.project.statemachine.states;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import ru.mail.polis.open.project.Bot;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
 
@@ -23,9 +24,12 @@ public class WeatherChatState implements ChatState {
     }
 
     @Override
-    public String update(String message, long chatId, List<String> buttonsNames) {
-
-        if (message.equals("/toMainMenu")) {
+    public String update(
+        String message,
+        long chatId,
+        List<String> buttonsNames
+    ) {
+        if (message.equals(Bot.TO_MAIN_MENU_BUTTON)) {
             stateMachine.setState(new MainMenuChatState(stateMachine));
             return null;
         }
@@ -49,7 +53,11 @@ public class WeatherChatState implements ChatState {
                 getMostFrequentCities()
             );
 
-            UserSearchStatisticsProvider.addInfoAboutRequest(message, chatId, "Weather");
+            UserSearchStatisticsProvider.addInfoAboutRequest(
+                message,
+                chatId,
+                "Weather"
+            );
 
             return "В городе: " + object.getString("name") + "\n" +
                 "Температура: " + main.getDouble("temp") + "C" + "\n" +

@@ -30,18 +30,26 @@ public class Bot extends TelegramLongPollingBot {
         MESSAGE
     }
 
-    private final Map<Long, ChatStateMachine> chatStateMachineSet;
+    public static final String TO_MAIN_MENU_BUTTON = "/toMainMenu";
+    public static final String WEATHER_BUTTON = "Weather";
+    public static final String NEWS_BUTTON = "News";
+
+    private static final String START_BUTTON = "/start";
+    private static final String SETTINGS_BUTTON = "/settings";
+    private static final String HELP_BUTTON = "/help";
 
     private static Bot instance = null;
     private static ExecutorService executorService = Executors.newFixedThreadPool(8);
 
-    protected Bot(DefaultBotOptions botOptions) {
+    private final Map<Long, ChatStateMachine> chatStateMachineSet;
+
+    private Bot(DefaultBotOptions botOptions) {
         super(botOptions);
 
         chatStateMachineSet = new HashMap<>();
     }
 
-    public synchronized static Bot createInstance(DefaultBotOptions botOptions) {
+    synchronized static Bot createInstance(DefaultBotOptions botOptions) {
         if (instance != null) {
             throw new IllegalArgumentException("Bot is already created");
         }
@@ -54,12 +62,32 @@ public class Bot extends TelegramLongPollingBot {
         return instance;
     }
 
-    public void sendMsg(Message message, String text, boolean replyRequired) {
-        sendMsg(message, text, replyRequired, ButtonsMode.CHAT, List.of("/start", "/help", "/settings", "/toMainMenu"));
+    private void sendMsg(
+        Message message,
+        String text,
+        boolean replyRequired
+    ) {
+        sendMsg(
+            message,
+            text,
+            replyRequired,
+            ButtonsMode.CHAT,
+            List.of(
+                START_BUTTON,
+                HELP_BUTTON,
+                SETTINGS_BUTTON,
+                TO_MAIN_MENU_BUTTON
+            )
+        );
     }
 
-    public void sendMsg(Message message, String text, boolean replyRequired, ButtonsMode buttonsMode, List<String> buttonsNames) {
-
+    private void sendMsg(
+        Message message,
+        String text,
+        boolean replyRequired,
+        ButtonsMode buttonsMode,
+        List<String> buttonsNames
+    ) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
 
@@ -72,11 +100,17 @@ public class Bot extends TelegramLongPollingBot {
         try {
             switch (buttonsMode) {
                 case CHAT: {
-                    setChatButtons(sendMessage, buttonsNames);
+                    setChatButtons(
+                        sendMessage,
+                        buttonsNames
+                    );
                     break;
                 }
                 case MESSAGE: {
-                    setMessageButtons(sendMessage, buttonsNames);
+                    setMessageButtons(
+                        sendMessage,
+                        buttonsNames
+                    );
                     break;
                 }
             }
@@ -108,7 +142,7 @@ public class Bot extends TelegramLongPollingBot {
 
                     if (message.hasText()) {
                         switch (message.getText()) {
-                            case "/start": {
+                            case START_BUTTON : {
                                 sendMsg(
                                     message,
                                     "Привет! Я бот Чижик, буду летать за нужной тебе информацией! \n"
@@ -116,7 +150,7 @@ public class Bot extends TelegramLongPollingBot {
                                     false
                                 );
                                 break;
-                            } case "/help": {
+                            } case HELP_BUTTON : {
                                 sendMsg(
                                     message,
                                     "Чтобы я мог помочь тебе узнать нужную информацию - введи /start.\n"
@@ -125,7 +159,7 @@ public class Bot extends TelegramLongPollingBot {
                                     true
                                 );
                                 break;
-                            } case "/settings": {
+                            } case SETTINGS_BUTTON : {
                                 sendMsg(
                                     message,
                                     "Что будем настраивать?",
@@ -142,7 +176,13 @@ public class Bot extends TelegramLongPollingBot {
                                         buttonsName
                                     );
 
-                                sendMsg(message, result, true, ButtonsMode.MESSAGE, buttonsName);
+                                sendMsg(
+                                    message,
+                                    result,
+                                    true,
+                                    ButtonsMode.MESSAGE,
+                                    buttonsName
+                                );
                             }
                         }
                     }
@@ -152,21 +192,21 @@ public class Bot extends TelegramLongPollingBot {
                     ChatStateMachine stateMachine = chatStateMachineSet.get(callbackMessage.getChatId());
 
                     switch (update.getCallbackQuery().getData()) {
-                        case "Weather": {
+                        case WEATHER_BUTTON: {
                             ChatState state = new WeatherChatState(stateMachine);
-                            stateMachine.setState(state);
-
-                            List<String> buttonsName = new ArrayList<>();
-                            String result = state.getInitialData(buttonsName);
-                            sendMsg(callbackMessage, result, false, ButtonsMode.MESSAGE, buttonsName);
+                            requestProcessing(
+                                stateMachine,
+                                callbackMessage,
+                                state
+                            );
                             break;
-                        } case "News": {
+                        } case NEWS_BUTTON: {
                             ChatState state = new NewsChatState(stateMachine);
-                            stateMachine.setState(state);
-
-                            List<String> buttonsName = new ArrayList<>();
-                            String result = state.getInitialData(buttonsName);
-                            sendMsg(callbackMessage, result, false, ButtonsMode.MESSAGE, buttonsName);
+                            requestProcessing(
+                                stateMachine,
+                                callbackMessage,
+                                state
+                            );
                             break;
                         } default: {
                             List<String> buttonsName = new ArrayList<>();
@@ -180,6 +220,23 @@ public class Bot extends TelegramLongPollingBot {
                     }
                 }
             }
+        );
+    }
+
+    private void requestProcessing(
+        ChatStateMachine stateMachine,
+        Message callbackMessage,
+        ChatState state
+    ) {
+        stateMachine.setState(state);
+
+        List<String> buttonsName = new ArrayList<>();
+        String result = state.getInitialData(buttonsName);
+        sendMsg(
+            callbackMessage,
+            result,
+            false,
+            ButtonsMode.MESSAGE, buttonsName
         );
     }
 
@@ -201,7 +258,7 @@ public class Bot extends TelegramLongPollingBot {
     }
 
 
-    public void setChatButtons(SendMessage sendMessage, List<String> buttonsNames) {
+    private void setChatButtons(SendMessage sendMessage, List<String> buttonsNames) {
 
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         sendMessage.setReplyMarkup(replyKeyboardMarkup);
