@@ -236,7 +236,8 @@ public class Bot extends TelegramLongPollingBot {
             callbackMessage,
             result,
             false,
-            ButtonsMode.MESSAGE, buttonsName
+            ButtonsMode.MESSAGE,
+            buttonsName
         );
     }
 
