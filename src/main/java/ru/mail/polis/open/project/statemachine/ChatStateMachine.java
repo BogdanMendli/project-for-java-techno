@@ -1,9 +1,10 @@
 package ru.mail.polis.open.project.statemachine;
 
-import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.mail.polis.open.project.statemachine.states.ChatState;
 import ru.mail.polis.open.project.statemachine.states.MainMenuChatState;
 import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
+
+import java.util.List;
 
 public class ChatStateMachine {
 
@@ -11,13 +12,20 @@ public class ChatStateMachine {
     private UserSearchStatisticsProvider statistics;
 
     public ChatStateMachine() {
-        state = new MainMenuChatState(this, null);
+
+        state = new MainMenuChatState(this);
         statistics = new UserSearchStatisticsProvider();
     }
 
-    public void update(Message message) {
+    public String update(String message, Long chatId, List<String> buttonsName) {
 
-        state.update(message);
+        String result = state.update(message, chatId, buttonsName);
+
+        if (result == null) {
+            result = state.getInitialData(buttonsName);
+        }
+
+        return result;
     }
 
     public void setState(ChatState state) {

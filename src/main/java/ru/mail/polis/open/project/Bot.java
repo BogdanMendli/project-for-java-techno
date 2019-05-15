@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
+import ru.mail.polis.open.project.statemachine.states.ChatState;
 import ru.mail.polis.open.project.statemachine.states.NewsChatState;
 import ru.mail.polis.open.project.statemachine.states.WeatherChatState;
 
@@ -23,6 +24,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Bot extends TelegramLongPollingBot {
+
+    enum ButtonsMode {
+        CHAT,
+        MESSAGE
+    }
 
     private final Map<Long, ChatStateMachine> chatStateMachineSet;
 
@@ -48,25 +54,12 @@ public class Bot extends TelegramLongPollingBot {
         return instance;
     }
 
-    public void sendMsg(
-        Message message,
-        String text,
-        boolean replyRequired
-    ) {
-        sendMsg(
-            message,
-            text,
-            replyRequired,
-            List.of()
-        );
+    public void sendMsg(Message message, String text, boolean replyRequired) {
+        sendMsg(message, text, replyRequired, ButtonsMode.CHAT, List.of("/start", "/help", "/settings", "/toMainMenu"));
     }
 
-    public void sendMsg(
-        Message message,
-        String text,
-        boolean replyRequired,
-        List<String> buttonsNames
-    ) {
+    public void sendMsg(Message message, String text, boolean replyRequired, ButtonsMode buttonsMode, List<String> buttonsNames) {
+
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
 
@@ -75,14 +68,18 @@ public class Bot extends TelegramLongPollingBot {
         if (replyRequired) {
             sendMessage.setReplyToMessageId(message.getMessageId());
         }
-
         sendMessage.setText(text);
         try {
-//            setChatButtons(sendMessage);
-            setMessageButtons(
-                sendMessage,
-                buttonsNames
-            );
+            switch (buttonsMode) {
+                case CHAT: {
+                    setChatButtons(sendMessage, buttonsNames);
+                    break;
+                }
+                case MESSAGE: {
+                    setMessageButtons(sendMessage, buttonsNames);
+                    break;
+                }
+            }
 
             execute(sendMessage);
 
@@ -94,7 +91,6 @@ public class Bot extends TelegramLongPollingBot {
 
     public void onUpdateReceived(Update update) {
 
-        // TODO: Call state machine
         executorService.submit(() -> {
                 if (update.hasMessage() && update.getMessage().hasText()) {
                     Message message = update.getMessage();
@@ -117,8 +113,7 @@ public class Bot extends TelegramLongPollingBot {
                                     message,
                                     "Привет! Я бот Чижик, буду летать за нужной тебе информацией! \n"
                                         + "Выбирай, что тебе хочется узнать, а я пока приготовлюсь  к полёту.",
-                                    false,
-                                    List.of("Weather", "News")
+                                    false
                                 );
                                 break;
                             } case "/help": {
@@ -130,7 +125,7 @@ public class Bot extends TelegramLongPollingBot {
                                     true
                                 );
                                 break;
-                            } case "/setting": {
+                            } case "/settings": {
                                 sendMsg(
                                     message,
                                     "Что будем настраивать?",
@@ -138,31 +133,49 @@ public class Bot extends TelegramLongPollingBot {
                                 );
                                 break;
                             } default: {
-                                chatStateMachineSet.get(message.getChatId()).update(message);
+                                List<String> buttonsName = new ArrayList<>();
+                                String result = chatStateMachineSet
+                                    .get(message.getChatId())
+                                    .update(
+                                        message.getText(),
+                                        message.getChatId(),
+                                        buttonsName
+                                    );
+
+                                sendMsg(message, result, true, ButtonsMode.MESSAGE, buttonsName);
                             }
                         }
                     }
                 } else if (update.hasCallbackQuery()) {
-                    ChatStateMachine stateMachine = chatStateMachineSet.get(
-                        update.getCallbackQuery().getMessage().getChatId()
-                    );
+
+                    Message callbackMessage = update.getCallbackQuery().getMessage();
+                    ChatStateMachine stateMachine = chatStateMachineSet.get(callbackMessage.getChatId());
+
                     switch (update.getCallbackQuery().getData()) {
                         case "Weather": {
-                            stateMachine.setState(
-                                new WeatherChatState(stateMachine,
-                                    update.getCallbackQuery().getMessage())
-                            );
+                            ChatState state = new WeatherChatState(stateMachine);
+                            stateMachine.setState(state);
+
+                            List<String> buttonsName = new ArrayList<>();
+                            String result = state.getInitialData(buttonsName);
+                            sendMsg(callbackMessage, result, false, ButtonsMode.MESSAGE, buttonsName);
                             break;
                         } case "News": {
-                            stateMachine.setState(new NewsChatState(
-                                stateMachine,
-                                update.getCallbackQuery().getMessage())
-                            );
+                            ChatState state = new NewsChatState(stateMachine);
+                            stateMachine.setState(state);
+
+                            List<String> buttonsName = new ArrayList<>();
+                            String result = state.getInitialData(buttonsName);
+                            sendMsg(callbackMessage, result, false, ButtonsMode.MESSAGE, buttonsName);
                             break;
                         } default: {
-                            stateMachine.update(
-                                update.getCallbackQuery().getMessage()
+                            List<String> buttonsName = new ArrayList<>();
+                            String result = stateMachine.update(
+                                update.getCallbackQuery().getData(),
+                                callbackMessage.getChatId(),
+                                buttonsName
                             );
+                            sendMsg(callbackMessage, result, false, ButtonsMode.MESSAGE, buttonsName);
                         }
                     }
                 }
@@ -188,7 +201,7 @@ public class Bot extends TelegramLongPollingBot {
     }
 
 
-    public void setChatButtons(SendMessage sendMessage) {
+    public void setChatButtons(SendMessage sendMessage, List<String> buttonsNames) {
 
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         sendMessage.setReplyMarkup(replyKeyboardMarkup);
@@ -200,11 +213,9 @@ public class Bot extends TelegramLongPollingBot {
         KeyboardRow keyboardFirstRow = new KeyboardRow();
         KeyboardRow keyboardSecondRow = new KeyboardRow();
 
-        keyboardFirstRow.add(new KeyboardButton("/start"));
-        keyboardFirstRow.add(new KeyboardButton("/help"));
-        keyboardSecondRow.add(new KeyboardButton("/setting"));
-        keyboardSecondRow.add(new KeyboardButton("/toMainMenu"));
-
+        for (String buttonName : buttonsNames) {
+            keyboardFirstRow.add(new KeyboardButton(buttonName));
+        }
         keyboardRowList.add(keyboardFirstRow);
         keyboardRowList.add(keyboardSecondRow);
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
