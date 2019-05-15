@@ -1,8 +1,10 @@
 package ru.mail.polis.open.project.statemachine.states;
 
-import org.telegram.telegrambots.meta.api.objects.Message;
+import java.util.List;
 
 public interface ChatState {
 
-    void update(Message message);
+    String update(String message, long chatId, List<String> buttonsNames);
+
+    String getInitialData(List<String> buttonsNames);
 }

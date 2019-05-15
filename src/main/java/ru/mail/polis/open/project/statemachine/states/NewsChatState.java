@@ -5,14 +5,12 @@ import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import ru.mail.polis.open.project.Bot;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 public class NewsChatState implements ChatState {
 
@@ -22,46 +20,30 @@ public class NewsChatState implements ChatState {
 
     private ChatStateMachine stateMachine;
 
-    public NewsChatState(ChatStateMachine stateMachine, Message message) {
-        // TODO: Draw User Interface displaying cities on buttons
-        this.stateMachine = stateMachine;
+    public NewsChatState(ChatStateMachine stateMachine) {
 
-        if (message != null) {
-            Bot.getInstance().sendMsg(
-                message,
-                "Введите город на английском",
-                false,
-                stateMachine.getStatisticsProvider().getMostFrequent(
-                    4,
-                    UserSearchStatisticsProvider.StatisticsMode.NEWS
-                )
-            );
-        }
+        this.stateMachine = stateMachine;
     }
 
     @Override
-    public void update(Message message) {
+    public String update(String message, long chatId, List<String> buttonsNames) {
 
-        if (message.getText().equals("/toMainMenu")) {
-            stateMachine.setState(
-                new MainMenuChatState(
-                    stateMachine,
-                    message
-                )
-            );
-            return;
+        if (message.equals("/toMainMenu")) {
+            stateMachine.setState(new MainMenuChatState(stateMachine));
+
+            return null;
         }
 
         try {
             URL url = new URL(
                 URL_BEFORE_CITY_NAME
                 + RSS
-                + message.getText()
+                + message
             );
 
             SyndFeedInput input = new SyndFeedInput();
             SyndFeed feed = input.build(new XmlReader(url));
-            StringBuilder info = new StringBuilder("");
+            StringBuilder info = new StringBuilder();
             byte currentNews = 0;
 
             for (SyndEntry entry : feed.getEntries()) {
@@ -85,26 +67,35 @@ public class NewsChatState implements ChatState {
 
             info.append("Source : ")
                 .append(URL_BEFORE_CITY_NAME)
-                .append(message.getText());
+                .append(message);
 
             UserSearchStatisticsProvider.addInfoAboutRequest(
                 message,
+                chatId,
                 "News"
             );
 
-            Bot.getInstance().sendMsg(
-                message,
-                info.toString(),
-                true
-            );
-        } catch (MalformedURLException e) {
-            Bot.getInstance().sendMsg(
-                message,
-                "Город не найден!",
-                true
-            );
+            stateMachine.getStatisticsProvider().onNewsSearch(message);
+            UserSearchStatisticsProvider.addInfoAboutRequest(message, chatId, "News");
+
+            buttonsNames.addAll(getMostFrequentCities());
+
+            return info.toString();
         } catch (FeedException | IOException e) {
-            e.printStackTrace();
+            return "City not found";
         }
+    }
+
+    @Override
+    public String getInitialData(List<String> buttonsNames) {
+        buttonsNames.addAll(getMostFrequentCities());
+        return "Новости\nВведите город на английском";
+    }
+
+    private List<String> getMostFrequentCities() {
+        return stateMachine.getStatisticsProvider().getMostFrequent(
+            4,
+            UserSearchStatisticsProvider.StatisticsMode.NEWS
+        );
     }
 }

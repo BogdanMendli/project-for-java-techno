@@ -1,7 +1,5 @@
 package ru.mail.polis.open.project.statistics;
 
-import org.telegram.telegrambots.meta.api.objects.Message;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -54,15 +52,15 @@ public class UserSearchStatisticsProvider {
         );
     }
 
-    public static void addInfoAboutRequest(Message message, String opportunity) {
+    public static void addInfoAboutRequest(String message, Long chatId, String opportunity) {
         LocalDateTime messageRequestTime = LocalDateTime.now();
 
         try {
             UserSearchStatisticsProvider.fw.write(
                 "chatId : "
-                    + message.getChatId().toString()
+                    + chatId.toString()
                     + " : Request about " + opportunity + ". City - "
-                    + message.getText() + " at "
+                    + message + " at "
                     + messageRequestTime.getHour() + ":"
                     + messageRequestTime.getMinute() + " "
                     + messageRequestTime.getDayOfMonth() + "-"
