@@ -26,9 +26,12 @@ public class WeatherChatState implements ChatState {
         if (message != null) {
             Bot.getInstance().sendMsg(
                 message,
-                "Введите город",
+                "Введите город на английском",
                 false,
-                stateMachine.getStatisticsProvider().getMostFrequent(4, UserSearchStatisticsProvider.StatisticsMode.WEATHER)
+                stateMachine.getStatisticsProvider().getMostFrequent(
+                    4,
+                    UserSearchStatisticsProvider.StatisticsMode.WEATHER
+                )
             );
         }
     }
@@ -37,7 +40,12 @@ public class WeatherChatState implements ChatState {
     public void update(Message message) {
 
         if (message.getText().equals("/toMainMenu")) {
-            stateMachine.setState(new MainMenuChatState(stateMachine, message));
+            stateMachine.setState(
+                new MainMenuChatState(
+                    stateMachine,
+                    message
+                )
+            );
             return;
         }
 
@@ -62,9 +70,15 @@ public class WeatherChatState implements ChatState {
                     "Температура: " + main.getDouble("temp") + "C" + "\n" +
                     "Влажность: " + main.getDouble("humidity") + "%" + "\n" +
                     "Осадки: " + getArray.getJSONObject(0).get("main") + "\n" +
-                    "http://openweathermap.org/img/w/" + getArray.getJSONObject(0).get("main") + ".png",
+                    "http://openweathermap.org/img/w/" + getArray.getJSONObject(0).get("icon") + ".png",
                 true,
-                stateMachine.getStatisticsProvider().getMostFrequent(4, UserSearchStatisticsProvider.StatisticsMode.WEATHER));
+                stateMachine.getStatisticsProvider().getMostFrequent(
+                    4,
+                    UserSearchStatisticsProvider.StatisticsMode.WEATHER
+                )
+            );
+
+            UserSearchStatisticsProvider.addInfoAboutRequest(message, "Weather");
         } catch (MalformedURLException e) {
             Bot.getInstance().sendMsg(message, "Город не найден!", true);
         } catch (IOException e) {

@@ -10,12 +10,9 @@ import ru.mail.polis.open.project.Bot;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.LocalDateTime;
 
 public class NewsChatState implements ChatState {
 
@@ -32,7 +29,7 @@ public class NewsChatState implements ChatState {
         if (message != null) {
             Bot.getInstance().sendMsg(
                 message,
-                "Введите город",
+                "Введите город на английском",
                 false,
                 stateMachine.getStatisticsProvider().getMostFrequent(
                     4,
@@ -46,18 +43,21 @@ public class NewsChatState implements ChatState {
     public void update(Message message) {
 
         if (message.getText().equals("/toMainMenu")) {
-            stateMachine.setState(new MainMenuChatState(stateMachine, message));
+            stateMachine.setState(
+                new MainMenuChatState(
+                    stateMachine,
+                    message
+                )
+            );
             return;
         }
 
-        try (FileWriter fw = new FileWriter(new File("NewsRequests.txt"),true)) {
+        try {
             URL url = new URL(
                 URL_BEFORE_CITY_NAME
                 + RSS
                 + message.getText()
             );
-
-            LocalDateTime messageRequestTime = LocalDateTime.now();
 
             SyndFeedInput input = new SyndFeedInput();
             SyndFeed feed = input.build(new XmlReader(url));
@@ -87,25 +87,24 @@ public class NewsChatState implements ChatState {
                 .append(URL_BEFORE_CITY_NAME)
                 .append(message.getText());
 
-            fw.write(
-                "chatId : "
-                    + message.getChatId().toString()
-                    + " : Request about News. City - "
-                    + message.getText() + " at "
-                    + messageRequestTime.getHour() + ":"
-                    + messageRequestTime.getMinute() + " "
-                    + messageRequestTime.getDayOfMonth() + "-"
-                    + messageRequestTime.getMonth().getValue() + "-"
-                    + messageRequestTime.getYear()
-                    + "\n"
+            UserSearchStatisticsProvider.addInfoAboutRequest(
+                message,
+                "News"
             );
 
-            Bot.getInstance().sendMsg(message, info.toString(), true);
+            Bot.getInstance().sendMsg(
+                message,
+                info.toString(),
+                true
+            );
         } catch (MalformedURLException e) {
-            Bot.getInstance().sendMsg(message, "Город не найден!", true);
+            Bot.getInstance().sendMsg(
+                message,
+                "Город не найден!",
+                true
+            );
         } catch (FeedException | IOException e) {
             e.printStackTrace();
         }
-        // TODO: Implement this
     }
 }
