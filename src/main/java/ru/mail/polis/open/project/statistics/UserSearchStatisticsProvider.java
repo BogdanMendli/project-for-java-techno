@@ -1,12 +1,9 @@
 package ru.mail.polis.open.project.statistics;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,24 +18,13 @@ public class UserSearchStatisticsProvider {
 
     private final Map<String, Integer> citiesWeatherSearchCounter;
     private final Map<String, Integer> citiesNewsSearchCounter;
-    private static List<File> statisticFiles;
-    private static FileWriter fw;
-    private static File file;
-    private static int countTakenStatistic;
+    private static Map<Long, File> files;
 
     public UserSearchStatisticsProvider() {
 
         citiesNewsSearchCounter = new HashMap<>();
         citiesWeatherSearchCounter = new HashMap<>();
-        statisticFiles = new ArrayList<>();
-        countTakenStatistic = 0;
-        try {
-            file = new File(
-                "Statistic-" + countTakenStatistic + ".txt");
-            fw = new FileWriter(file, true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        files = new HashMap<>();
     }
 
     public void onWeatherSearch(String city) {
@@ -59,7 +45,12 @@ public class UserSearchStatisticsProvider {
         LocalDateTime messageRequestTime = LocalDateTime.now();
 
         try {
-            UserSearchStatisticsProvider.fw.write(
+            if (!files.containsKey(chatId)) {
+                files.put(chatId, new File("Statistic-" + chatId));
+            }
+            FileWriter fw = new FileWriter(files.get(chatId), true);
+
+            fw.write(
                 "chatId : "
                     + chatId.toString()
                     + " : Request about " + opportunity + ". City - "
@@ -100,26 +91,16 @@ public class UserSearchStatisticsProvider {
             .collect(Collectors.toList());
     }
 
-    public static File getCurrentStatistic() {
+    public synchronized static Map<Long, File> getCurrentStatistic() {
+        return files;
+    }
 
-        File currentFile = file;
-        try {
-            fw.close();
-            BufferedReader br = new BufferedReader(new FileReader(currentFile));
-            file = new File("Statistic-" + ++countTakenStatistic + ".txt");
-            fw = new FileWriter(file);
-            br.lines().forEach((line) -> {
-                try {
-                    fw.write(line);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+    public static synchronized void resetRequest(Long chatId) {
+        try (FileWriter fw = new FileWriter(files.get(chatId))) {
+            fw.write("");
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return currentFile;
     }
 
     public void clear() {
