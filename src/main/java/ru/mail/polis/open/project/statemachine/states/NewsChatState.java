@@ -27,11 +27,7 @@ public class NewsChatState implements ChatState {
     }
 
     @Override
-    public String update(
-        String message,
-        long chatId,
-        List<String> buttonsNames
-    ) {
+    public String update(String message, long chatId, List<String> buttonsNames) {
         if (message.equals(Bot.MENU_COMMAND)) {
             stateMachine.setState(new MainMenuChatState(stateMachine));
 

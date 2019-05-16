@@ -14,11 +14,7 @@ public class MainMenuChatState implements ChatState {
     }
 
     @Override
-    public String update(
-        String message,
-        long chatId,
-        List<String> buttonsNames
-    ) {
+    public String update(String message, long chatId, List<String> buttonsNames) {
         switch (message) {
             case Bot.MENU_COMMAND : {
                 buttonsNames.addAll(getButtonsNames());
@@ -42,9 +38,6 @@ public class MainMenuChatState implements ChatState {
     }
 
     private List<String> getButtonsNames() {
-        return List.of(
-            Bot.WEATHER_COMMAND,
-            Bot.NEWS_COMMAND
-        );
+        return List.of(Bot.WEATHER_COMMAND, Bot.NEWS_COMMAND);
     }
 }

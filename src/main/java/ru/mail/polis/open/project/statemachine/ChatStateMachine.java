@@ -17,11 +17,7 @@ public class ChatStateMachine {
         statistics = new UserSearchStatisticsProvider();
     }
 
-    public String update(
-        String message,
-        Long chatId,
-        List<String> buttonsName
-    ) {
+    public String update(String message, Long chatId, List<String> buttonsName) {
         String result = state.update(message, chatId, buttonsName);
 
         if (result == null) {
