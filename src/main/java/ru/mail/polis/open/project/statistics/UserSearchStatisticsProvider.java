@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ public class UserSearchStatisticsProvider {
 
     private final Map<String, Integer> citiesWeatherSearchCounter;
     private final Map<String, Integer> citiesNewsSearchCounter;
+    private static List<File> statisticFiles;
     private static FileWriter fw;
     private static File file;
     private static int countTakenStatistic;
@@ -28,6 +30,7 @@ public class UserSearchStatisticsProvider {
 
         citiesNewsSearchCounter = new HashMap<>();
         citiesWeatherSearchCounter = new HashMap<>();
+        statisticFiles = new ArrayList<>();
         countTakenStatistic = 0;
         try {
             file = new File(

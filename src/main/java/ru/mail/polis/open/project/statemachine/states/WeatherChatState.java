@@ -46,15 +46,9 @@ public class WeatherChatState implements ChatState {
 
             stateMachine.getStatisticsProvider().onWeatherSearch(object.getString("name"));
 
-            buttonsNames.addAll(
-                getMostFrequentCities()
-            );
+            buttonsNames.addAll(getMostFrequentCities());
 
-            UserSearchStatisticsProvider.addInfoAboutRequest(
-                message,
-                chatId,
-                "Weather"
-            );
+            UserSearchStatisticsProvider.addInfoAboutRequest(message, chatId, "Weather");
 
             return "В городе: " + object.getString("name") + "\n" +
                 "Температура: " + main.getDouble("temp") + "C" + "\n" +
