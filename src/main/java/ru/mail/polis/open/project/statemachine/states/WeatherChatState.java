@@ -2,6 +2,7 @@ package ru.mail.polis.open.project.statemachine.states;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import ru.mail.polis.open.project.Bot;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
 
@@ -15,6 +16,7 @@ public class WeatherChatState implements ChatState {
 
     private static final String URL_BEFORE_CITY_NAME = "http://api.openweathermap.org/data/2.5/weather?q=";
     private static final String URL_AFTER_CITY_NAME = "&units=metric&appid=6fff53a641b9b9a799cfd6b079f5cd4e";
+    private static final String URL_BEFORE_ICON = "http://openweathermap.org/img/w/";
     private final ChatStateMachine stateMachine;
 
     public WeatherChatState(ChatStateMachine stateMachine) {
@@ -24,8 +26,7 @@ public class WeatherChatState implements ChatState {
 
     @Override
     public String update(String message, long chatId, List<String> buttonsNames) {
-
-        if (message.equals("/toMainMenu")) {
+        if (message.equals(Bot.MENU_COMMAND)) {
             stateMachine.setState(new MainMenuChatState(stateMachine));
             return null;
         }
@@ -45,9 +46,7 @@ public class WeatherChatState implements ChatState {
 
             stateMachine.getStatisticsProvider().onWeatherSearch(object.getString("name"));
 
-            buttonsNames.addAll(
-                getMostFrequentCities()
-            );
+            buttonsNames.addAll(getMostFrequentCities());
 
             UserSearchStatisticsProvider.addInfoAboutRequest(message, chatId, "Weather");
 
@@ -55,7 +54,7 @@ public class WeatherChatState implements ChatState {
                 "Температура: " + main.getDouble("temp") + "C" + "\n" +
                 "Влажность: " + main.getDouble("humidity") + "%" + "\n" +
                 "Осадки: " + getArray.getJSONObject(0).get("main") + "\n" +
-                "http://openweathermap.org/img/w/" + getArray.getJSONObject(0).get("icon") + ".png";
+                URL_BEFORE_ICON + getArray.getJSONObject(0).get("icon") + ".png";
 
         } catch (IOException e) {
             return "Город не найден!";

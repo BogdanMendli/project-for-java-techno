@@ -1,5 +1,6 @@
 package ru.mail.polis.open.project.statemachine.states;
 
+import ru.mail.polis.open.project.Bot;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 
 import java.util.List;
@@ -14,15 +15,14 @@ public class MainMenuChatState implements ChatState {
 
     @Override
     public String update(String message, long chatId, List<String> buttonsNames) {
-
         switch (message) {
-            case "/toMainMenu" : {
+            case Bot.MENU_COMMAND : {
                 buttonsNames.addAll(getButtonsNames());
                 return "Ты уже в главном меню!";
-            } case "Weather" : {
+            } case Bot.WEATHER_COMMAND: {
                 stateMachine.setState(new WeatherChatState(stateMachine));
                 return null;
-            } case "News" : {
+            } case Bot.NEWS_COMMAND: {
                 stateMachine.setState(new NewsChatState(stateMachine));
                 return null;
             } default : {
@@ -38,6 +38,6 @@ public class MainMenuChatState implements ChatState {
     }
 
     private List<String> getButtonsNames() {
-        return List.of("Weather", "News");
+        return List.of(Bot.WEATHER_COMMAND, Bot.NEWS_COMMAND);
     }
 }
