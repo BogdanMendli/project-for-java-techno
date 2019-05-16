@@ -69,18 +69,10 @@ public class NewsChatState implements ChatState {
                 .append(URL_BEFORE_CITY_NAME)
                 .append(message);
 
-            UserSearchStatisticsProvider.addInfoAboutRequest(
-                message,
-                chatId,
-                "News"
-            );
+            UserSearchStatisticsProvider.addInfoAboutRequest(message, chatId, "News");
 
             stateMachine.getStatisticsProvider().onNewsSearch(message);
-            UserSearchStatisticsProvider.addInfoAboutRequest(
-                message,
-                chatId,
-                "News"
-            );
+            UserSearchStatisticsProvider.addInfoAboutRequest(message, chatId, "News");
 
             buttonsNames.addAll(getMostFrequentCities());
 
