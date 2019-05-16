@@ -50,10 +50,10 @@ public class WeatherChatState implements ChatState {
             JSONArray getArray = object.getJSONArray("weather");
 
             stateMachine.getStatisticsProvider().onWeatherSearch(object.getString("name"));
+            UserSearchStatisticsProvider.addInfoAboutRequest(message, chatId, "Weather");
 
             buttonsNames.addAll(getMostFrequentCities());
 
-            UserSearchStatisticsProvider.addInfoAboutRequest(message, chatId, "Weather");
 
             return "В городе: " + object.getString("name") + "\n" +
                 "Температура: " + main.getDouble("temp") + "C" + "\n" +

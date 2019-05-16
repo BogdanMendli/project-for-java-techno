@@ -54,9 +54,7 @@ public class UserSearchStatisticsProvider {
     public static void addInfoAboutRequest(String message, Long chatId, String ability) {
         LocalDateTime messageRequestTime = LocalDateTime.now();
 
-        try {
-            FileWriter fw = new FileWriter(new File("Statistic-" + chatId), true);
-
+        try (FileWriter fw = new FileWriter(new File("Statistic-" + chatId), true)) {
             fw.write(
                 "chatId : "
                     + chatId.toString()

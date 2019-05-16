@@ -15,7 +15,6 @@ import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 import ru.mail.polis.open.project.statemachine.states.ChatState;
 import ru.mail.polis.open.project.statemachine.states.NewsChatState;
 import ru.mail.polis.open.project.statemachine.states.WeatherChatState;
-import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +40,6 @@ public class Bot extends TelegramLongPollingBot {
     public static final String WEATHER_COMMAND = "Weather";
     public static final String NEWS_COMMAND = "News";
     public static final String MENU_COMMAND = "/menu";
-
     private static final String START_COMMAND = "/start";
     private static final String RESET_COMMAND = "/reset";
     private static final String HELP_COMMAND = "/help";
@@ -173,9 +171,8 @@ public class Bot extends TelegramLongPollingBot {
                             } case HELP_COMMAND : {
                                 sendMsg(
                                     message,
-                                    "Чтобы я мог помочь тебе узнать нужную информацию - введи /start.\n"
-                                        + "Команда для настроек - /setting.\n"
-                                        + "Чтобы вернуться в главное меню используй команду /toMainMenu.",
+                                    "Чтобы я мог помочь тебе узнать нужную информацию - введи " + START_COMMAND + "\n"
+                                        + "Чтобы вернуться в главное меню используй команду " + MENU_COMMAND,
                                     true
                                 );
                                 break;
