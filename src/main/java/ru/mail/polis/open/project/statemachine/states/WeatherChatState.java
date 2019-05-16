@@ -12,6 +12,11 @@ import java.net.URL;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * State that provides bot with ability to get info about news
+ * @see ChatState
+ * @see ChatStateMachine
+ */
 public class WeatherChatState implements ChatState {
 
     private static final String URL_BEFORE_CITY_NAME = "http://api.openweathermap.org/data/2.5/weather?q=";
@@ -72,7 +77,7 @@ public class WeatherChatState implements ChatState {
     private List<String> getMostFrequentCities() {
         return stateMachine.getStatisticsProvider().getMostFrequent(
             4,
-            UserSearchStatisticsProvider.StatisticsMode.WEATHER
+            UserSearchStatisticsProvider.BotAbility.WEATHER
         );
     }
 }
