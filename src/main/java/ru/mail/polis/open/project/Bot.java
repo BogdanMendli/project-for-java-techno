@@ -30,26 +30,26 @@ public class Bot extends TelegramLongPollingBot {
         MESSAGE
     }
 
-    public static final String TO_MAIN_MENU_BUTTON = "/toMainMenu";
-    public static final String WEATHER_BUTTON = "Weather";
-    public static final String NEWS_BUTTON = "News";
+    public static final String WEATHER_COMMAND = "Weather";
+    public static final String NEWS_COMMAND = "News";
+    public static final String MENU_COMMAND = "/menu";
 
-    private static final String START_BUTTON = "/start";
-    private static final String SETTINGS_BUTTON = "/settings";
-    private static final String HELP_BUTTON = "/help";
+    private static final String START_COMMAND = "/start";
+    private static final String RESET_COMMAND = "/reset";
+    private static final String HELP_COMMAND = "/help";
 
     private static Bot instance = null;
     private static ExecutorService executorService = Executors.newFixedThreadPool(8);
 
     private final Map<Long, ChatStateMachine> chatStateMachineSet;
 
-    private Bot(DefaultBotOptions botOptions) {
+    protected Bot(DefaultBotOptions botOptions) {
         super(botOptions);
 
         chatStateMachineSet = new HashMap<>();
     }
 
-    synchronized static Bot createInstance(DefaultBotOptions botOptions) {
+    public synchronized static Bot createInstance(DefaultBotOptions botOptions) {
         if (instance != null) {
             throw new IllegalArgumentException("Bot is already created");
         }
@@ -62,21 +62,17 @@ public class Bot extends TelegramLongPollingBot {
         return instance;
     }
 
-    private void sendMsg(
-        Message message,
-        String text,
-        boolean replyRequired
-    ) {
+    private void sendMsg(Message message, String text, boolean replyRequired) {
         sendMsg(
             message,
             text,
             replyRequired,
             ButtonsMode.CHAT,
             List.of(
-                START_BUTTON,
-                HELP_BUTTON,
-                SETTINGS_BUTTON,
-                TO_MAIN_MENU_BUTTON
+                START_COMMAND,
+                HELP_COMMAND,
+                RESET_COMMAND,
+                MENU_COMMAND
             )
         );
     }
@@ -100,17 +96,11 @@ public class Bot extends TelegramLongPollingBot {
         try {
             switch (buttonsMode) {
                 case CHAT: {
-                    setChatButtons(
-                        sendMessage,
-                        buttonsNames
-                    );
+                    setChatButtons(sendMessage, buttonsNames);
                     break;
                 }
                 case MESSAGE: {
-                    setMessageButtons(
-                        sendMessage,
-                        buttonsNames
-                    );
+                    setMessageButtons(sendMessage, buttonsNames);
                     break;
                 }
             }
@@ -142,7 +132,7 @@ public class Bot extends TelegramLongPollingBot {
 
                     if (message.hasText()) {
                         switch (message.getText()) {
-                            case START_BUTTON : {
+                            case START_COMMAND : {
                                 sendMsg(
                                     message,
                                     "Привет! Я бот Чижик, буду летать за нужной тебе информацией! \n"
@@ -150,19 +140,19 @@ public class Bot extends TelegramLongPollingBot {
                                     false
                                 );
                                 break;
-                            } case HELP_BUTTON : {
+                            } case HELP_COMMAND : {
                                 sendMsg(
                                     message,
                                     "Чтобы я мог помочь тебе узнать нужную информацию - введи /start.\n"
                                         + "Команда для настроек - /setting.\n"
-                                        + "Чтобы вернуться в главное меню используй команду /toMainMenu",
+                                        + "Чтобы вернуться в главное меню используй команду /toMainMenu.",
                                     true
                                 );
                                 break;
-                            } case SETTINGS_BUTTON : {
+                            } case RESET_COMMAND: {
                                 sendMsg(
                                     message,
-                                    "Что будем настраивать?",
+                                    "Твои запросы удалены.",
                                     true
                                 );
                                 break;
@@ -170,19 +160,9 @@ public class Bot extends TelegramLongPollingBot {
                                 List<String> buttonsName = new ArrayList<>();
                                 String result = chatStateMachineSet
                                     .get(message.getChatId())
-                                    .update(
-                                        message.getText(),
-                                        message.getChatId(),
-                                        buttonsName
-                                    );
+                                    .update(message.getText(), message.getChatId(), buttonsName);
 
-                                sendMsg(
-                                    message,
-                                    result,
-                                    true,
-                                    ButtonsMode.MESSAGE,
-                                    buttonsName
-                                );
+                                sendMsg(message, result, true, ButtonsMode.MESSAGE, buttonsName);
                             }
                         }
                     }
@@ -192,21 +172,13 @@ public class Bot extends TelegramLongPollingBot {
                     ChatStateMachine stateMachine = chatStateMachineSet.get(callbackMessage.getChatId());
 
                     switch (update.getCallbackQuery().getData()) {
-                        case WEATHER_BUTTON: {
+                        case WEATHER_COMMAND: {
                             ChatState state = new WeatherChatState(stateMachine);
-                            requestProcessing(
-                                stateMachine,
-                                callbackMessage,
-                                state
-                            );
+                            requestProcessing(stateMachine, callbackMessage, state);
                             break;
-                        } case NEWS_BUTTON: {
+                        } case NEWS_COMMAND: {
                             ChatState state = new NewsChatState(stateMachine);
-                            requestProcessing(
-                                stateMachine,
-                                callbackMessage,
-                                state
-                            );
+                            requestProcessing(stateMachine, callbackMessage, state);
                             break;
                         } default: {
                             List<String> buttonsName = new ArrayList<>();
@@ -223,22 +195,12 @@ public class Bot extends TelegramLongPollingBot {
         );
     }
 
-    private void requestProcessing(
-        ChatStateMachine stateMachine,
-        Message callbackMessage,
-        ChatState state
-    ) {
+    private void requestProcessing(ChatStateMachine stateMachine, Message callbackMessage, ChatState state) {
         stateMachine.setState(state);
 
         List<String> buttonsName = new ArrayList<>();
         String result = state.getInitialData(buttonsName);
-        sendMsg(
-            callbackMessage,
-            result,
-            false,
-            ButtonsMode.MESSAGE,
-            buttonsName
-        );
+        sendMsg(callbackMessage, result, false, ButtonsMode.MESSAGE, buttonsName);
     }
 
 

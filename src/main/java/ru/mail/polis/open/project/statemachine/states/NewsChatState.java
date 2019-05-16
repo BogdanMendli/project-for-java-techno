@@ -32,7 +32,7 @@ public class NewsChatState implements ChatState {
         long chatId,
         List<String> buttonsNames
     ) {
-        if (message.equals(Bot.TO_MAIN_MENU_BUTTON)) {
+        if (message.equals(Bot.MENU_COMMAND)) {
             stateMachine.setState(new MainMenuChatState(stateMachine));
 
             return null;

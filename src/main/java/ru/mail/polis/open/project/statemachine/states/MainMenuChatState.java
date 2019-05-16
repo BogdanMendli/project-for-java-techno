@@ -20,13 +20,13 @@ public class MainMenuChatState implements ChatState {
         List<String> buttonsNames
     ) {
         switch (message) {
-            case Bot.TO_MAIN_MENU_BUTTON : {
+            case Bot.MENU_COMMAND : {
                 buttonsNames.addAll(getButtonsNames());
                 return "Ты уже в главном меню!";
-            } case Bot.WEATHER_BUTTON : {
+            } case Bot.WEATHER_COMMAND: {
                 stateMachine.setState(new WeatherChatState(stateMachine));
                 return null;
-            } case Bot.NEWS_BUTTON : {
+            } case Bot.NEWS_COMMAND: {
                 stateMachine.setState(new NewsChatState(stateMachine));
                 return null;
             } default : {
@@ -43,8 +43,8 @@ public class MainMenuChatState implements ChatState {
 
     private List<String> getButtonsNames() {
         return List.of(
-            Bot.WEATHER_BUTTON,
-            Bot.NEWS_BUTTON
+            Bot.WEATHER_COMMAND,
+            Bot.NEWS_COMMAND
         );
     }
 }
