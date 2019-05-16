@@ -6,6 +6,9 @@ import org.telegram.telegrambots.meta.ApiContext;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
+/**
+ * Class that creates bot with proxy
+ */
 public class BotCreator {
 
     private static final String PROXY_HOST = "51.38.123.195";

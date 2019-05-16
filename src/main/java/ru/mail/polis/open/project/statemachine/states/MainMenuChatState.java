@@ -5,6 +5,11 @@ import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 
 import java.util.List;
 
+/**
+ * State that provides bot with ability to move between the menus
+ * @see ChatState
+ * @see ChatStateMachine
+ */
 public class MainMenuChatState implements ChatState {
 
     private final ChatStateMachine stateMachine;
