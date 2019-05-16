@@ -15,6 +15,7 @@ import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 import ru.mail.polis.open.project.statemachine.states.ChatState;
 import ru.mail.polis.open.project.statemachine.states.NewsChatState;
 import ru.mail.polis.open.project.statemachine.states.WeatherChatState;
+import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -152,9 +153,10 @@ public class Bot extends TelegramLongPollingBot {
                             } case RESET_COMMAND: {
                                 sendMsg(
                                     message,
-                                    "Твои запросы удалены.",
+                                    "Твои запросы сброшены.",
                                     true
                                 );
+                                UserSearchStatisticsProvider.resetRequest(message.getChatId());
                                 break;
                             } default: {
                                 List<String> buttonsName = new ArrayList<>();
