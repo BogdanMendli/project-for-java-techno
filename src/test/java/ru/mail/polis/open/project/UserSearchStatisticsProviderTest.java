@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;;
 import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 
@@ -234,102 +235,6 @@ class UserSearchStatisticsProviderTest {
     }
 
     @Test
-    void testWorkingAddInfoAboutRequest() {
-        UserSearchStatisticsProvider.addInfoAboutRequest(
-            "Moscow",
-            444563L,
-            "News"
-        );
-        UserSearchStatisticsProvider.addInfoAboutRequest(
-            "Moscow",
-            444563L,
-            "Weather"
-        );
-        UserSearchStatisticsProvider.addInfoAboutRequest(
-            "Bryansk",
-            66757L,
-            "News"
-        );
-        UserSearchStatisticsProvider.addInfoAboutRequest(
-            "Luga",
-            44563565463L,
-            "News"
-        );
-        UserSearchStatisticsProvider.addInfoAboutRequest(
-            "Moscow",
-            456463453563L,
-            "Weather"
-        );
-
-        assertEquals(
-            UserSearchStatisticsProvider.getCurrentStatistics().size(),
-            4
-        );
-        assertTrue(UserSearchStatisticsProvider.getCurrentStatistics().containsKey(444563L));
-        assertTrue(UserSearchStatisticsProvider.getCurrentStatistics().containsKey(66757L));
-        assertTrue(UserSearchStatisticsProvider.getCurrentStatistics().containsKey(44563565463L));
-        assertTrue(UserSearchStatisticsProvider.getCurrentStatistics().containsKey(456463453563L));
-        assertEquals(
-            UserSearchStatisticsProvider.getCurrentStatistics().get(444563L).getName(),
-            "Statistic-" + 444563L + ".txt"
-        );
-        assertEquals(
-            UserSearchStatisticsProvider.getCurrentStatistics().get(66757L).getName(),
-            "Statistic-" + 66757L + ".txt"
-        );
-        assertEquals(
-            UserSearchStatisticsProvider.getCurrentStatistics().get(44563565463L).getName(),
-            "Statistic-" + 44563565463L + ".txt"
-        );
-        assertEquals(
-            UserSearchStatisticsProvider.getCurrentStatistics().get(456463453563L).getName(),
-            "Statistic-" + 456463453563L + ".txt"
-        );
-    }
-
-    @Test
-    void testWorkingClear() {
-        statisticsProvider.onWeatherSearch("Moscow");
-        statisticsProvider.onWeatherSearch("Moscow");
-        statisticsProvider.onWeatherSearch("Moscow");
-        statisticsProvider.onWeatherSearch("Moscow");
-        statisticsProvider.onWeatherSearch("Moscow");
-        statisticsProvider.onWeatherSearch("Moscow");
-        statisticsProvider.onWeatherSearch("Luga");
-        statisticsProvider.onWeatherSearch("Luga");
-
-        statisticsProvider.onNewsSearch("Moscow");
-        statisticsProvider.onNewsSearch("Moscow");
-        statisticsProvider.onNewsSearch("Moscow");
-        statisticsProvider.onNewsSearch("Moscow");
-        statisticsProvider.onNewsSearch("Moscow");
-        statisticsProvider.onNewsSearch("Moscow");
-        statisticsProvider.onNewsSearch("Luga");
-        statisticsProvider.onNewsSearch("Luga");
-        statisticsProvider.onNewsSearch("Luga");
-
-        assertEquals(
-            statisticsProvider.getCitiesWeatherSearchCounter().size(),
-            2
-        );
-        assertEquals(
-            statisticsProvider.getCitiesNewsSearchCounter().size(),
-            2
-        );
-
-        statisticsProvider.clear();
-
-        assertEquals(
-            statisticsProvider.getCitiesWeatherSearchCounter().size(),
-            0
-        );
-        assertEquals(
-            statisticsProvider.getCitiesNewsSearchCounter().size(),
-            0
-        );
-    }
-
-    @Test
     void testResetRequest() {
         UserSearchStatisticsProvider.addInfoAboutRequest(
             "Moscow",
@@ -348,7 +253,7 @@ class UserSearchStatisticsProviderTest {
 
         try {
             BufferedReader br = new BufferedReader(
-                new FileReader(UserSearchStatisticsProvider.getCurrentStatistics().get(444563L))
+                new FileReader(new File("logs/Statistic-" + 444563L + ".txt"))
             );
             assertEquals(br.lines().count(), 3);
             statisticsProvider.clear(444563L);
@@ -363,7 +268,6 @@ class UserSearchStatisticsProviderTest {
     void reset() {
         statisticsProvider.getCitiesNewsSearchCounter().clear();
         statisticsProvider.getCitiesWeatherSearchCounter().clear();
-        UserSearchStatisticsProvider.getCurrentStatistics().clear();
         UserSearchStatisticsProvider.clearAllRequest();
     }
 }

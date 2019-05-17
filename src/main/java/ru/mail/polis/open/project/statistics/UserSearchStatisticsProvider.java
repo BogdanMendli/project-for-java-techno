@@ -24,14 +24,12 @@ public class UserSearchStatisticsProvider {
 
     private final Map<String, Integer> citiesWeatherSearchCounter;
     private final Map<String, Integer> citiesNewsSearchCounter;
-    private static Map<Long, File> currentStatistics;
 
 
     public UserSearchStatisticsProvider() {
 
         citiesNewsSearchCounter = new HashMap<>();
         citiesWeatherSearchCounter = new HashMap<>();
-        currentStatistics = new HashMap<>();
     }
 
     public void onWeatherSearch(String city) {
@@ -57,11 +55,7 @@ public class UserSearchStatisticsProvider {
     public static void addInfoAboutRequest(String message, Long chatId, String ability) {
         LocalDateTime messageRequestTime = LocalDateTime.now();
 
-        if (!currentStatistics.containsKey(chatId)) {
-            currentStatistics.put(chatId, new File("Statistic-" + chatId + ".txt"));
-        }
-
-        try (FileWriter fw = new FileWriter(currentStatistics.get(chatId), true)) {
+        try (FileWriter fw = new FileWriter("logs/Statistic-" + chatId + ".txt", true)) {
             fw.write(
                 "chatId : "
                     + chatId.toString()
@@ -109,23 +103,14 @@ public class UserSearchStatisticsProvider {
             .collect(Collectors.toList());
     }
 
-    public static Map<Long, File> getCurrentStatistics() {
-        return currentStatistics;
-    }
-
     /**
      * Clears all info about chat
      */
-    public void clear() {
-        citiesWeatherSearchCounter.clear();
-        citiesNewsSearchCounter.clear();
-    }
-
     public void clear(Long chatId) {
         citiesWeatherSearchCounter.clear();
         citiesNewsSearchCounter.clear();
 
-        try (FileWriter fw = new FileWriter(new File("Statistic-" + chatId))) {
+        try (FileWriter fw = new FileWriter(new File("logs/Statistic-" + chatId + ".txt"))) {
             fw.write("");
         } catch (IOException e) {
             e.printStackTrace();
@@ -141,8 +126,9 @@ public class UserSearchStatisticsProvider {
     }
 
     public static synchronized void clearAllRequest() {
-        for (Map.Entry<Long, File> file : currentStatistics.entrySet()) {
-            try (FileWriter fw = new FileWriter(file.getValue())) {
+        for (File file : new File("logs").listFiles()) {
+            try (FileWriter fw = new FileWriter(file)) {
+                fw.write("");
             } catch (IOException e) {
                 e.printStackTrace();
             }
