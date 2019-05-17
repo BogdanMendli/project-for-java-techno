@@ -1,5 +1,6 @@
 package ru.mail.polis.open.project.statistics;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,13 +19,13 @@ public class UserSearchStatisticsProvider {
 
     private final Map<String, Integer> citiesWeatherSearchCounter;
     private final Map<String, Integer> citiesNewsSearchCounter;
-    private static Map<Long, File> files;
+    private static Map<Long, File> currentStatistics;
 
     public UserSearchStatisticsProvider() {
 
         citiesNewsSearchCounter = new HashMap<>();
         citiesWeatherSearchCounter = new HashMap<>();
-        files = new HashMap<>();
+        currentStatistics = new HashMap<>();
     }
 
     public void onWeatherSearch(String city) {
@@ -44,11 +45,11 @@ public class UserSearchStatisticsProvider {
     public static void addInfoAboutRequest(String message, Long chatId, String opportunity) {
         LocalDateTime messageRequestTime = LocalDateTime.now();
 
-        try {
-            if (!files.containsKey(chatId)) {
-                files.put(chatId, new File("Statistic-" + chatId));
-            }
-            FileWriter fw = new FileWriter(files.get(chatId), true);
+        if (!currentStatistics.containsKey(chatId)) {
+            currentStatistics.put(chatId, new File("Statistic-" + chatId + ".txt"));
+        }
+
+        try (FileWriter fw = new FileWriter(currentStatistics.get(chatId), true)) {
 
             fw.write(
                 "chatId : "
@@ -91,13 +92,12 @@ public class UserSearchStatisticsProvider {
             .collect(Collectors.toList());
     }
 
-    public synchronized static Map<Long, File> getCurrentStatistic() {
-        return files;
+    public static Map<Long, File> getCurrentStatistics() {
+        return currentStatistics;
     }
 
     public static synchronized void resetRequest(Long chatId) {
-        try (FileWriter fw = new FileWriter(files.get(chatId))) {
-            fw.write("");
+        try (FileWriter fw = new FileWriter(currentStatistics.get(chatId))) {
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -106,5 +106,22 @@ public class UserSearchStatisticsProvider {
     public void clear() {
         citiesWeatherSearchCounter.clear();
         citiesNewsSearchCounter.clear();
+    }
+
+    public Map<String, Integer> getCitiesWeatherSearchCounter() {
+        return citiesWeatherSearchCounter;
+    }
+
+    public Map<String, Integer> getCitiesNewsSearchCounter() {
+        return citiesNewsSearchCounter;
+    }
+
+    public static synchronized void resetAllRequest() {
+        for (Map.Entry<Long, File> file : currentStatistics.entrySet()) {
+            try (FileWriter fw = new FileWriter(file.getValue())) {
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
