@@ -13,16 +13,21 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
+/**
+ * State that provides bot with ability to get info about news
+ * @see ChatState
+ * @see ChatStateMachine
+ */
 public class NewsChatState implements ChatState {
 
     private static final String URL_BEFORE_CITY_NAME = "https://news.rambler.ru/";
     private static final String RSS = "rss/";
-    private static final byte LIMIT = 5;
+    // TODO: Move this to Bot class. Bot have to decide how much buttons to display by himself
+    private static final byte BUTTONS_LIMIT = 5;
 
     private ChatStateMachine stateMachine;
 
     public NewsChatState(ChatStateMachine stateMachine) {
-
         this.stateMachine = stateMachine;
     }
 
@@ -60,7 +65,7 @@ public class NewsChatState implements ChatState {
                     )
                     .append("\n\n---------------------------------------------------------\n\n");
 
-                if (currentNews == LIMIT) {
+                if (currentNews == BUTTONS_LIMIT) {
                     break;
                 }
             }
@@ -68,8 +73,6 @@ public class NewsChatState implements ChatState {
             info.append("Source : ")
                 .append(URL_BEFORE_CITY_NAME)
                 .append(message);
-
-            UserSearchStatisticsProvider.addInfoAboutRequest(message, chatId, "News");
 
             stateMachine.getStatisticsProvider().onNewsSearch(message);
             UserSearchStatisticsProvider.addInfoAboutRequest(message, chatId, "News");
@@ -91,7 +94,7 @@ public class NewsChatState implements ChatState {
     private List<String> getMostFrequentCities() {
         return stateMachine.getStatisticsProvider().getMostFrequent(
             4,
-            UserSearchStatisticsProvider.StatisticsMode.NEWS
+            UserSearchStatisticsProvider.BotAbility.NEWS
         );
     }
 }

@@ -115,7 +115,7 @@ class UserSearchStatisticsProviderTest {
         assertEquals(
             statisticsProvider.getMostFrequent(
                 2,
-                UserSearchStatisticsProvider.StatisticsMode.NEWS
+                UserSearchStatisticsProvider.BotAbility.NEWS
             ).size(),
             2
         );
@@ -123,37 +123,37 @@ class UserSearchStatisticsProviderTest {
         assertTrue(
             statisticsProvider.getMostFrequent(
                 3,
-                UserSearchStatisticsProvider.StatisticsMode.NEWS
+                UserSearchStatisticsProvider.BotAbility.NEWS
             ).contains("Luga")
         );
         assertTrue(
             statisticsProvider.getMostFrequent(
                 3,
-                UserSearchStatisticsProvider.StatisticsMode.NEWS
+                UserSearchStatisticsProvider.BotAbility.NEWS
             ).contains("Moscow")
         );
         assertTrue(
             statisticsProvider.getMostFrequent(
                 3,
-                UserSearchStatisticsProvider.StatisticsMode.NEWS
+                UserSearchStatisticsProvider.BotAbility.NEWS
             ).contains("Simpheropol")
         );
         assertFalse(
             statisticsProvider.getMostFrequent(
                 3,
-                UserSearchStatisticsProvider.StatisticsMode.NEWS
+                UserSearchStatisticsProvider.BotAbility.NEWS
             ).contains("Pskov")
         );
         assertFalse(
             statisticsProvider.getMostFrequent(
                 3,
-                UserSearchStatisticsProvider.StatisticsMode.NEWS
+                UserSearchStatisticsProvider.BotAbility.NEWS
             ).contains("Bryansk")
         );
         assertFalse(
             statisticsProvider.getMostFrequent(
                 3,
-                UserSearchStatisticsProvider.StatisticsMode.NEWS
+                UserSearchStatisticsProvider.BotAbility.NEWS
             ).contains("Surgut")
         );
 
@@ -190,7 +190,7 @@ class UserSearchStatisticsProviderTest {
         assertEquals(
             statisticsProvider.getMostFrequent(
                 2,
-                UserSearchStatisticsProvider.StatisticsMode.WEATHER
+                UserSearchStatisticsProvider.BotAbility.WEATHER
             ).size(),
             2
         );
@@ -198,37 +198,37 @@ class UserSearchStatisticsProviderTest {
         assertTrue(
             statisticsProvider.getMostFrequent(
                 3,
-                UserSearchStatisticsProvider.StatisticsMode.WEATHER
+                UserSearchStatisticsProvider.BotAbility.WEATHER
             ).contains("Luga")
         );
         assertTrue(
             statisticsProvider.getMostFrequent(
                 3,
-                UserSearchStatisticsProvider.StatisticsMode.WEATHER
+                UserSearchStatisticsProvider.BotAbility.WEATHER
             ).contains("Moscow")
         );
         assertTrue(
             statisticsProvider.getMostFrequent(
                 3,
-                UserSearchStatisticsProvider.StatisticsMode.WEATHER
+                UserSearchStatisticsProvider.BotAbility.WEATHER
             ).contains("Simpheropol")
         );
         assertFalse(
             statisticsProvider.getMostFrequent(
                 3,
-                UserSearchStatisticsProvider.StatisticsMode.WEATHER
+                UserSearchStatisticsProvider.BotAbility.WEATHER
             ).contains("Pskov")
         );
         assertFalse(
             statisticsProvider.getMostFrequent(
                 3,
-                UserSearchStatisticsProvider.StatisticsMode.WEATHER
+                UserSearchStatisticsProvider.BotAbility.WEATHER
             ).contains("Bryansk")
         );
         assertFalse(
             statisticsProvider.getMostFrequent(
                 3,
-                UserSearchStatisticsProvider.StatisticsMode.WEATHER
+                UserSearchStatisticsProvider.BotAbility.WEATHER
             ).contains("Surgut")
         );
     }
@@ -351,7 +351,7 @@ class UserSearchStatisticsProviderTest {
                 new FileReader(UserSearchStatisticsProvider.getCurrentStatistics().get(444563L))
             );
             assertEquals(br.lines().count(), 3);
-            UserSearchStatisticsProvider.resetRequest(444563L);
+            statisticsProvider.clear(444563L);
             assertEquals(br.lines().count(), 0);
 
         } catch (FileNotFoundException e) {
@@ -364,6 +364,6 @@ class UserSearchStatisticsProviderTest {
         statisticsProvider.getCitiesNewsSearchCounter().clear();
         statisticsProvider.getCitiesWeatherSearchCounter().clear();
         UserSearchStatisticsProvider.getCurrentStatistics().clear();
-        UserSearchStatisticsProvider.resetAllRequest();
+        UserSearchStatisticsProvider.clearAllRequest();
     }
 }

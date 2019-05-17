@@ -9,9 +9,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Keeps statistics about users requests and writes it to files
+ */
 public class UserSearchStatisticsProvider {
 
-    public enum StatisticsMode {
+    /**
+     * Enumeration representing about what the request was made
+     */
+    public enum BotAbility {
         WEATHER,
         NEWS
     }
@@ -19,6 +25,7 @@ public class UserSearchStatisticsProvider {
     private final Map<String, Integer> citiesWeatherSearchCounter;
     private final Map<String, Integer> citiesNewsSearchCounter;
     private static Map<Long, File> currentStatistics;
+
 
     public UserSearchStatisticsProvider() {
 
@@ -41,7 +48,13 @@ public class UserSearchStatisticsProvider {
         );
     }
 
-    public static void addInfoAboutRequest(String message, Long chatId, String opportunity) {
+    /**
+     * Logs chat history to file
+     * @param message - request
+     * @param chatId - where thee request was made
+     * @param ability - which of the bots ability was used
+     */
+    public static void addInfoAboutRequest(String message, Long chatId, String ability) {
         LocalDateTime messageRequestTime = LocalDateTime.now();
 
         if (!currentStatistics.containsKey(chatId)) {
@@ -49,11 +62,10 @@ public class UserSearchStatisticsProvider {
         }
 
         try (FileWriter fw = new FileWriter(currentStatistics.get(chatId), true)) {
-
             fw.write(
                 "chatId : "
                     + chatId.toString()
-                    + " : Request about " + opportunity + ". City - "
+                    + " : Request about " + ability + ". City - "
                     + message + " at "
                     + messageRequestTime.getHour() + ":"
                     + messageRequestTime.getMinute() + " "
@@ -67,10 +79,16 @@ public class UserSearchStatisticsProvider {
         }
     }
 
-    public List<String> getMostFrequent(int count, StatisticsMode mode) {
+    /**
+     * Returns most frequent request from users on given ability
+     * @param count - how much items have to be returned
+     * @param ability - statistics pool to return from
+     * @return list of strings - most frequent requests
+     */
+    public List<String> getMostFrequent(int count, BotAbility ability) {
 
         Map<String, Integer> requiredMap;
-        switch (mode) {
+        switch (ability) {
             case WEATHER: {
                 requiredMap = citiesWeatherSearchCounter;
                 break;
@@ -78,7 +96,7 @@ public class UserSearchStatisticsProvider {
                 requiredMap = citiesNewsSearchCounter;
                 break;
             } default: {
-                throw new IllegalArgumentException("No such statistics mode");
+                throw new IllegalArgumentException("No such statistics ability");
             }
         }
 
@@ -95,16 +113,23 @@ public class UserSearchStatisticsProvider {
         return currentStatistics;
     }
 
-    public static synchronized void resetRequest(Long chatId) {
-        try (FileWriter fw = new FileWriter(currentStatistics.get(chatId))) {
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
+    /**
+     * Clears all info about chat
+     */
     public void clear() {
         citiesWeatherSearchCounter.clear();
         citiesNewsSearchCounter.clear();
+    }
+
+    public void clear(Long chatId) {
+        citiesWeatherSearchCounter.clear();
+        citiesNewsSearchCounter.clear();
+
+        try (FileWriter fw = new FileWriter(new File("Statistic-" + chatId))) {
+            fw.write("");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Map<String, Integer> getCitiesWeatherSearchCounter() {
@@ -115,7 +140,7 @@ public class UserSearchStatisticsProvider {
         return citiesNewsSearchCounter;
     }
 
-    public static synchronized void resetAllRequest() {
+    public static synchronized void clearAllRequest() {
         for (Map.Entry<Long, File> file : currentStatistics.entrySet()) {
             try (FileWriter fw = new FileWriter(file.getValue())) {
             } catch (IOException e) {

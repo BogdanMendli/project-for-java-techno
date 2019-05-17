@@ -15,7 +15,6 @@ import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 import ru.mail.polis.open.project.statemachine.states.ChatState;
 import ru.mail.polis.open.project.statemachine.states.NewsChatState;
 import ru.mail.polis.open.project.statemachine.states.WeatherChatState;
-import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,8 +23,15 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Class that manages bots activity
+ */
 public class Bot extends TelegramLongPollingBot {
 
+    /**
+     * Enumeration representing whether the buttons should be shown
+     * at the bottom of the chat or attached to the message
+     */
     enum ButtonsMode {
         CHAT,
         MESSAGE
@@ -34,7 +40,6 @@ public class Bot extends TelegramLongPollingBot {
     public static final String WEATHER_COMMAND = "Weather";
     public static final String NEWS_COMMAND = "News";
     public static final String MENU_COMMAND = "/menu";
-
     private static final String START_COMMAND = "/start";
     private static final String RESET_COMMAND = "/reset";
     private static final String HELP_COMMAND = "/help";
@@ -42,7 +47,13 @@ public class Bot extends TelegramLongPollingBot {
     private static Bot instance = null;
     private static ExecutorService executorService = Executors.newFixedThreadPool(8);
 
+    /**
+     * Each chat has it's own state machine describing it's state.
+     * ChatId is the key
+     * Instance of ChatStateMachine corresponds to each ChatId
+     */
     private final Map<Long, ChatStateMachine> chatStateMachineSet;
+
 
     protected Bot(DefaultBotOptions botOptions) {
         super(botOptions);
@@ -78,6 +89,17 @@ public class Bot extends TelegramLongPollingBot {
         );
     }
 
+    /**
+     * Sends message to person
+     *
+     * @param message - message to reply on
+     * @param text - text to send
+     * @param replyRequired - specifies whether reply is needed or bot simply have to send message
+     * @param buttonsMode - where to attach buttons
+     * @param buttonsNames - list of strings that should be put on buttons
+     *
+     *  @see ButtonsMode
+     */
     private void sendMsg(
         Message message,
         String text,
@@ -114,6 +136,11 @@ public class Bot extends TelegramLongPollingBot {
     }
 
 
+    /**
+     * Entrance point when Bot gets an update (i.e. user sends a message)
+     *
+     * @param update - update to process
+     */
     public void onUpdateReceived(Update update) {
 
         executorService.submit(() -> {
@@ -144,9 +171,8 @@ public class Bot extends TelegramLongPollingBot {
                             } case HELP_COMMAND : {
                                 sendMsg(
                                     message,
-                                    "Чтобы я мог помочь тебе узнать нужную информацию - введи /start.\n"
-                                        + "Команда для настроек - /setting.\n"
-                                        + "Чтобы вернуться в главное меню используй команду /toMainMenu.",
+                                    "Чтобы я мог помочь тебе узнать нужную информацию - введи " + START_COMMAND + "\n"
+                                        + "Чтобы вернуться в главное меню используй команду " + MENU_COMMAND,
                                     true
                                 );
                                 break;
@@ -156,7 +182,10 @@ public class Bot extends TelegramLongPollingBot {
                                     "Твои запросы сброшены.",
                                     true
                                 );
-                                UserSearchStatisticsProvider.resetRequest(message.getChatId());
+                                chatStateMachineSet
+                                    .get(message.getChatId())
+                                    .getStatisticsProvider()
+                                    .clear(message.getChatId());
                                 break;
                             } default: {
                                 List<String> buttonsName = new ArrayList<>();
@@ -197,6 +226,12 @@ public class Bot extends TelegramLongPollingBot {
         );
     }
 
+    /**
+     * Direct intervention to StateMashine in order to change it's state by force
+     * @param stateMachine - machine to change state in
+     * @param callbackMessage - message to relpy on
+     * @param state - new state of machine
+     */
     private void requestProcessing(ChatStateMachine stateMachine, Message callbackMessage, ChatState state) {
         stateMachine.setState(state);
 
@@ -205,7 +240,11 @@ public class Bot extends TelegramLongPollingBot {
         sendMsg(callbackMessage, result, false, ButtonsMode.MESSAGE, buttonsName);
     }
 
-
+    /**
+     * Attaches buttons to message
+     * @param sendMessage - message to attach buttons to
+     * @param buttonsNames - list of strings that should be displayed on buttons
+     */
     private void setMessageButtons(SendMessage sendMessage, List<String> buttonsNames) {
 
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
@@ -222,7 +261,11 @@ public class Bot extends TelegramLongPollingBot {
         inlineKeyboardMarkup.setKeyboard(inlineButtons);
     }
 
-
+    /**
+     * Attaches buttons to whole chat
+     * @param sendMessage - message with that the buttons will be attached
+     * @param buttonsNames - list of strings that should be displayed on buttons
+     */
     private void setChatButtons(SendMessage sendMessage, List<String> buttonsNames) {
 
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
