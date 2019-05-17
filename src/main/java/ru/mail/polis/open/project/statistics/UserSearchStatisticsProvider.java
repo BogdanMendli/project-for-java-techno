@@ -25,6 +25,7 @@ public class UserSearchStatisticsProvider {
     private final Map<String, Integer> citiesWeatherSearchCounter;
     private final Map<String, Integer> citiesNewsSearchCounter;
 
+
     public UserSearchStatisticsProvider() {
 
         citiesNewsSearchCounter = new HashMap<>();
@@ -54,7 +55,7 @@ public class UserSearchStatisticsProvider {
     public static void addInfoAboutRequest(String message, Long chatId, String ability) {
         LocalDateTime messageRequestTime = LocalDateTime.now();
 
-        try (FileWriter fw = new FileWriter(new File("Statistic-" + chatId), true)) {
+        try (FileWriter fw = new FileWriter("logs/Statistic-" + chatId + ".txt", true)) {
             fw.write(
                 "chatId : "
                     + chatId.toString()
@@ -109,10 +110,28 @@ public class UserSearchStatisticsProvider {
         citiesWeatherSearchCounter.clear();
         citiesNewsSearchCounter.clear();
 
-        try (FileWriter fw = new FileWriter(new File("Statistic-" + chatId))) {
+        try (FileWriter fw = new FileWriter(new File("logs/Statistic-" + chatId + ".txt"))) {
             fw.write("");
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public Map<String, Integer> getCitiesWeatherSearchCounter() {
+        return citiesWeatherSearchCounter;
+    }
+
+    public Map<String, Integer> getCitiesNewsSearchCounter() {
+        return citiesNewsSearchCounter;
+    }
+
+    public static synchronized void clearAllRequest() {
+        for (File file : new File("logs").listFiles()) {
+            try (FileWriter fw = new FileWriter(file)) {
+                fw.write("");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
