@@ -9,7 +9,6 @@ import ru.mail.polis.open.project.statemachine.states.WeatherChatState;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ChatStateMachineTest {
