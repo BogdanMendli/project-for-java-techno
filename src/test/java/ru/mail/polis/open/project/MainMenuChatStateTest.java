@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MainMenuChatStateTest {
@@ -39,7 +40,13 @@ class MainMenuChatStateTest {
             chatStateMachine.getState(),
             new MainMenuChatState(chatStateMachine)
         );
-
+        assertThrows(
+            NullPointerException.class,
+            () -> chatStateMachine.update(
+                null,
+                564356L,
+                new ArrayList<>())
+        );
         assertNull(
             mainMenuChatState.update(
             "Weather",

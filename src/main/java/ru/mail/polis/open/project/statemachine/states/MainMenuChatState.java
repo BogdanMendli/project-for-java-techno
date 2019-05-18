@@ -40,7 +40,7 @@ public class MainMenuChatState implements ChatState {
     @Override
     public String getInitialData(List<String> buttonsNames) {
         buttonsNames.addAll(getButtonsNames());
-        return "Вы в главном меню";
+        return "Ты в главном меню!";
     }
 
     private List<String> getButtonsNames() {

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
+import ru.mail.polis.open.project.statemachine.states.MainMenuChatState;
 import ru.mail.polis.open.project.statemachine.states.NewsChatState;
 
 import java.io.IOException;
@@ -17,15 +18,18 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NewsChatStateTest {
 
     private static NewsChatState newsChatState;
+    private static ChatStateMachine chatStateMachine;
 
     @BeforeAll
     void createInstance() {
-        newsChatState = new NewsChatState(new ChatStateMachine());
+        chatStateMachine = new ChatStateMachine();
+        newsChatState = new NewsChatState(chatStateMachine);
     }
 
     @Test
@@ -39,8 +43,18 @@ class NewsChatStateTest {
             ),
             "Город не найден!"
         );
-
+        assertThrows(
+            NullPointerException.class,
+            () -> newsChatState.update(
+                null,
+                564356L,
+                new ArrayList<>())
+        );
         assertNull(newsChatState.update("/menu", 453453L, new ArrayList<>()));
+        assertEquals(
+            chatStateMachine.getState(),
+            new MainMenuChatState(chatStateMachine)
+        );
 
         URL url = new URL("https://news.rambler.ru/rss/Luga");
 

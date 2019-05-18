@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
+import ru.mail.polis.open.project.statemachine.states.MainMenuChatState;
 import ru.mail.polis.open.project.statemachine.states.WeatherChatState;
 
 import java.io.IOException;
@@ -16,15 +17,18 @@ import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class WeatherChatStateTest {
 
     private static WeatherChatState weatherChatState;
+    private static ChatStateMachine chatStateMachine;
 
     @BeforeAll
     void createInstance() {
-        weatherChatState = new WeatherChatState(new ChatStateMachine());
+        chatStateMachine = new ChatStateMachine();
+        weatherChatState = new WeatherChatState(chatStateMachine);
     }
 
     @Test
@@ -38,8 +42,18 @@ class WeatherChatStateTest {
             ),
             "Город не найден!"
         );
-
+        assertThrows(
+            NullPointerException.class,
+            () -> weatherChatState.update(
+                null,
+                564356L,
+                new ArrayList<>())
+        );
         assertNull(weatherChatState.update("/menu", 453453L, new ArrayList<>()));
+        assertEquals(
+            chatStateMachine.getState(),
+            new MainMenuChatState(chatStateMachine)
+        );
 
         URL url = new URL(
             "http://api.openweathermap.org/dat"
