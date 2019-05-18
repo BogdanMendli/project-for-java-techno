@@ -278,9 +278,11 @@ public class Bot extends TelegramLongPollingBot {
         KeyboardRow keyboardFirstRow = new KeyboardRow();
         KeyboardRow keyboardSecondRow = new KeyboardRow();
 
-        for (String buttonName : buttonsNames) {
-            keyboardFirstRow.add(new KeyboardButton(buttonName));
-        }
+        keyboardFirstRow.add(buttonsNames.get(0));
+        keyboardFirstRow.add(buttonsNames.get(1));
+        keyboardSecondRow.add(buttonsNames.get(2));
+        keyboardSecondRow.add(buttonsNames.get(3));
+
         keyboardRowList.add(keyboardFirstRow);
         keyboardRowList.add(keyboardSecondRow);
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
