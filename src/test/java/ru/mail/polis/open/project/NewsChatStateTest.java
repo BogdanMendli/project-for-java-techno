@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 import ru.mail.polis.open.project.statemachine.states.NewsChatState;
-import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
 
 import java.io.IOException;
 import java.net.URL;
@@ -22,13 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NewsChatStateTest {
 
-    private static ChatStateMachine chatStateMachine;
     private static NewsChatState newsChatState;
 
     @BeforeAll
     void createInstance() {
-        chatStateMachine = new ChatStateMachine();
-        newsChatState = new NewsChatState(chatStateMachine);
+        newsChatState = new NewsChatState(new ChatStateMachine());
     }
 
     @Test
@@ -40,7 +37,7 @@ class NewsChatStateTest {
                 345345L,
                 new ArrayList<>()
             ),
-            "Город не найден."
+            "Город не найден!"
         );
 
         assertNull(newsChatState.update("/menu", 453453L, new ArrayList<>()));

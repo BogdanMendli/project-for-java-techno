@@ -82,7 +82,7 @@ public class NewsChatState implements ChatState {
 
             return info.toString();
         } catch (FeedException | IOException e) {
-            return "Город не найден.";
+            return "Город не найден!";
         }
     }
 

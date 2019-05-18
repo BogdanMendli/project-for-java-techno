@@ -1,7 +1,9 @@
 package ru.mail.polis.open.project;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;;
+import org.junit.jupiter.api.TestInstance;
 import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
 
 import java.io.BufferedReader;
@@ -13,9 +15,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserSearchStatisticsProviderTest {
 
-    private static UserSearchStatisticsProvider statisticsProvider = new UserSearchStatisticsProvider();
+    private static UserSearchStatisticsProvider statisticsProvider;
+
+    @BeforeAll
+    void createInstance() {
+        statisticsProvider = new UserSearchStatisticsProvider();
+    }
 
     @Test
     void testWorkingOnWeatherSearch() {
