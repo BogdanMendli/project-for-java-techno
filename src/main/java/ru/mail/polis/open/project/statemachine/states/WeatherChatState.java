@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 /**
@@ -79,5 +80,22 @@ public class WeatherChatState implements ChatState {
             4,
             UserSearchStatisticsProvider.BotAbility.WEATHER
         );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        WeatherChatState that = (WeatherChatState) o;
+        return Objects.equals(stateMachine, that.stateMachine);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(stateMachine);
     }
 }

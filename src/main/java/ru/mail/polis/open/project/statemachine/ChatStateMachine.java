@@ -7,6 +7,7 @@ import ru.mail.polis.open.project.statemachine.states.WeatherChatState;
 import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Class that represents State Machine for chat
@@ -62,7 +63,29 @@ public class ChatStateMachine {
         this.state = state;
     }
 
+    public ChatState getState() {
+        return state;
+    }
+
     public UserSearchStatisticsProvider getStatisticsProvider() {
         return statistics;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChatStateMachine that = (ChatStateMachine) o;
+        return Objects.equals(getState(), that.getState())
+            && Objects.equals(statistics, that.statistics);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getState(), statistics);
     }
 }
