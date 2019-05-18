@@ -276,8 +276,6 @@ public class Bot extends TelegramLongPollingBot {
         replyKeyboardMarkup.setOneTimeKeyboard(false);
 
         List<KeyboardRow> keyboardRowList = new ArrayList<>();
-        KeyboardRow keyboardFirstRow = new KeyboardRow();
-        KeyboardRow keyboardSecondRow = new KeyboardRow();
 
         int itemsInRow = 0;
         KeyboardRow row = new KeyboardRow(); ;
@@ -294,8 +292,6 @@ public class Bot extends TelegramLongPollingBot {
 
         keyboardRowList.add(row);
 
-        keyboardRowList.add(keyboardFirstRow);
-        keyboardRowList.add(keyboardSecondRow);
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
     }
 

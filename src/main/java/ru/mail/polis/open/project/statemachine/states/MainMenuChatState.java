@@ -4,6 +4,7 @@ import ru.mail.polis.open.project.Bot;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * State that provides bot with ability to move between the menus
@@ -44,5 +45,22 @@ public class MainMenuChatState implements ChatState {
 
     private List<String> getButtonsNames() {
         return List.of(Bot.WEATHER_COMMAND, Bot.NEWS_COMMAND);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        MainMenuChatState that = (MainMenuChatState) o;
+        return Objects.equals(stateMachine, that.stateMachine);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(stateMachine);
     }
 }

@@ -12,6 +12,7 @@ import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * State that provides bot with ability to get info about news
@@ -96,5 +97,22 @@ public class NewsChatState implements ChatState {
             4,
             UserSearchStatisticsProvider.BotAbility.NEWS
         );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        NewsChatState that = (NewsChatState) o;
+        return Objects.equals(stateMachine, that.stateMachine);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(stateMachine);
     }
 }
