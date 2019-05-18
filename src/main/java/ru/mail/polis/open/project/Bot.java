@@ -43,6 +43,7 @@ public class Bot extends TelegramLongPollingBot {
     private static final String START_COMMAND = "/start";
     private static final String RESET_COMMAND = "/reset";
     private static final String HELP_COMMAND = "/help";
+    private static final Integer BUTTONS_IN_ROW = 2;
 
     private static Bot instance = null;
     private static ExecutorService executorService = Executors.newFixedThreadPool(8);
@@ -278,10 +279,20 @@ public class Bot extends TelegramLongPollingBot {
         KeyboardRow keyboardFirstRow = new KeyboardRow();
         KeyboardRow keyboardSecondRow = new KeyboardRow();
 
-        keyboardFirstRow.add(buttonsNames.get(0));
-        keyboardFirstRow.add(buttonsNames.get(1));
-        keyboardSecondRow.add(buttonsNames.get(2));
-        keyboardSecondRow.add(buttonsNames.get(3));
+        int itemsInRow = 0;
+        KeyboardRow row = new KeyboardRow(); ;
+        for (String buttonName : buttonsNames)  {
+            if (itemsInRow == BUTTONS_IN_ROW) {
+                keyboardRowList.add(row);
+                row = new KeyboardRow();
+                itemsInRow = 0;
+            }
+            row.add(buttonName);
+
+            itemsInRow++;
+        }
+
+        keyboardRowList.add(row);
 
         keyboardRowList.add(keyboardFirstRow);
         keyboardRowList.add(keyboardSecondRow);
