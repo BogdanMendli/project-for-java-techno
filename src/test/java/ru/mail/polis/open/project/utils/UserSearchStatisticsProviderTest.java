@@ -234,35 +234,6 @@ class UserSearchStatisticsProviderTest {
         );
     }
 
-//    @Test
-//    void testResetRequest() {
-//        UserSearchStatisticsProvider.addInfoAboutRequest(
-//            "Moscow",
-//            444563L,
-//            "News"
-//        );UserSearchStatisticsProvider.addInfoAboutRequest(
-//            "Moscow",
-//            444563L,
-//            "Weather"
-//        );
-//        UserSearchStatisticsProvider.addInfoAboutRequest(
-//            "Moscow",
-//            444563L,
-//            "Weather"
-//        );
-//
-//        try {
-//            BufferedReader br = new BufferedReader(
-//                new FileReader(new File("logs/Statistic-" + 444563L + ".txt"))
-//            );
-//            assertEquals(br.lines().count(), 3);
-//            statisticsProvider.clear(444563L);
-//            assertEquals(br.lines().count(), 0);
-//
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     @AfterEach
     void reset() {

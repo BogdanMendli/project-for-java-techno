@@ -35,6 +35,7 @@ class WeatherChatStateTest {
             ),
             "Город не найден!"
         );
+
         Assertions.assertThrows(
             NullPointerException.class,
             () -> weatherChatState.update(
@@ -42,10 +43,11 @@ class WeatherChatStateTest {
                 564356L,
                 new ArrayList<>())
         );
+
         Assertions.assertNull(weatherChatState.update("/menu", 453453L, new ArrayList<>()));
         Assertions.assertEquals(
-            chatStateMachine.getState(),
-            new MainMenuChatState(chatStateMachine)
+            new MainMenuChatState(chatStateMachine),
+            chatStateMachine.getState()
         );
 
         URL url = new URL(
