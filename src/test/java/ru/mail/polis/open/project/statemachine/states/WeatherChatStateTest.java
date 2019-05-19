@@ -2,7 +2,6 @@ package ru.mail.polis.open.project.statemachine.states;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
@@ -12,6 +11,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class WeatherChatStateTest {
 
@@ -27,7 +28,7 @@ class WeatherChatStateTest {
     @Test
     void testWorkingUpdate() throws IOException {
 
-        Assertions.assertEquals(
+        assertEquals(
             weatherChatState.update(
                 "gshshsth",
                 345345L,
@@ -36,7 +37,7 @@ class WeatherChatStateTest {
             "Город не найден!"
         );
 
-        Assertions.assertThrows(
+        assertThrows(
             NullPointerException.class,
             () -> weatherChatState.update(
                 null,
@@ -44,8 +45,8 @@ class WeatherChatStateTest {
                 new ArrayList<>())
         );
 
-        Assertions.assertNull(weatherChatState.update("/menu", 453453L, new ArrayList<>()));
-        Assertions.assertEquals(
+        assertNull(weatherChatState.update("/menu", 453453L, new ArrayList<>()));
+        assertEquals(
             new MainMenuChatState(chatStateMachine),
             chatStateMachine.getState()
         );
@@ -71,7 +72,7 @@ class WeatherChatStateTest {
             "Осадки: " + getArray.getJSONObject(0).get("main") + "\n" +
             "http://openweathermap.org/img/w/" + getArray.getJSONObject(0).get("icon") + ".png";
 
-        Assertions.assertEquals(
+        assertEquals(
             resultMsg,
             weatherChatState.update(
                 "Luga",
@@ -83,7 +84,7 @@ class WeatherChatStateTest {
 
     @Test
     void testWorkingGetInitialData() {
-        Assertions.assertEquals(
+        assertEquals(
             weatherChatState.getInitialData(new ArrayList<>()),
             "Погода\nВведите город на английском"
         );

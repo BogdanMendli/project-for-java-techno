@@ -5,7 +5,6 @@ import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
@@ -13,6 +12,8 @@ import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class NewsChatStateTest {
 
@@ -28,7 +29,7 @@ class NewsChatStateTest {
     @Test
     void testWorkingUpdate() throws IOException, FeedException {
 
-        Assertions.assertEquals(
+        assertEquals(
             "Город не найден!",
             newsChatState.update(
                 "gshshsth",
@@ -37,7 +38,7 @@ class NewsChatStateTest {
             )
         );
 
-        Assertions.assertThrows(
+        assertThrows(
             NullPointerException.class,
             () -> newsChatState.update(
                 null,
@@ -45,8 +46,8 @@ class NewsChatStateTest {
                 new ArrayList<>())
         );
 
-        Assertions.assertNull(newsChatState.update("/menu", 453453L, new ArrayList<>()));
-        Assertions.assertEquals(
+        assertNull(newsChatState.update("/menu", 453453L, new ArrayList<>()));
+        assertEquals(
             new MainMenuChatState(chatStateMachine),
             chatStateMachine.getState()
         );
@@ -80,7 +81,7 @@ class NewsChatStateTest {
             .append("https://news.rambler.ru/")
             .append("Luga");
 
-        Assertions.assertEquals(
+        assertEquals(
             info.toString(),
             newsChatState.update(
                 "Luga",
@@ -92,7 +93,7 @@ class NewsChatStateTest {
 
     @Test
     void testWorkingGetInitialData() {
-        Assertions.assertEquals(
+        assertEquals(
             "Новости\nВведите город на английском",
             newsChatState.getInitialData(new ArrayList<>())
         );
