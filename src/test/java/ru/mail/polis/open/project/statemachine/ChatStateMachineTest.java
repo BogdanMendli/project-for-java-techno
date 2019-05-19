@@ -1,7 +1,6 @@
-package ru.mail.polis.open.project;
+package ru.mail.polis.open.project.statemachine;
 
 import org.junit.jupiter.api.Test;
-import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 import ru.mail.polis.open.project.statemachine.states.MainMenuChatState;
 import ru.mail.polis.open.project.statemachine.states.NewsChatState;
 import ru.mail.polis.open.project.statemachine.states.WeatherChatState;

@@ -7,7 +7,7 @@ import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 import ru.mail.polis.open.project.Bot;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
-import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
+import ru.mail.polis.open.project.utils.Logger;
 
 import java.io.IOException;
 import java.net.URL;
@@ -23,7 +23,6 @@ public class NewsChatState implements ChatState {
 
     private static final String URL_BEFORE_CITY_NAME = "https://news.rambler.ru/";
     private static final String RSS = "rss/";
-    // TODO: Move this to Bot class. Bot have to decide how much buttons to display by himself
     private static final byte BUTTONS_LIMIT = 5;
 
     private ChatStateMachine stateMachine;
@@ -33,7 +32,7 @@ public class NewsChatState implements ChatState {
     }
 
     @Override
-    public String update(String message, long chatId, List<String> buttonsNames) {
+    public String update(String message, long chatId, List<String> mostFrequentRequests) {
         if (message.equals(Bot.MENU_COMMAND)) {
             stateMachine.setState(new MainMenuChatState(stateMachine));
 
@@ -75,10 +74,10 @@ public class NewsChatState implements ChatState {
                 .append(URL_BEFORE_CITY_NAME)
                 .append(message);
 
-            stateMachine.getStatisticsProvider().onNewsSearch(message);
-            UserSearchStatisticsProvider.addInfoAboutRequest(message, chatId, "News");
+            stateMachine.getStatisticsProvider().onRequest("News", message);
+            Logger.addInfoAboutRequest(message, chatId, "News");
 
-            buttonsNames.addAll(getMostFrequentCities());
+            mostFrequentRequests.addAll(getMostFrequentCities());
 
             return info.toString();
         } catch (FeedException | IOException e) {
@@ -87,15 +86,15 @@ public class NewsChatState implements ChatState {
     }
 
     @Override
-    public String getInitialData(List<String> buttonsNames) {
-        buttonsNames.addAll(getMostFrequentCities());
+    public String getInitialData(List<String> motFrequentRequest) {
+        motFrequentRequest.addAll(getMostFrequentCities());
         return "Новости\nВведите город на английском";
     }
 
     private List<String> getMostFrequentCities() {
         return stateMachine.getStatisticsProvider().getMostFrequent(
             4,
-            UserSearchStatisticsProvider.BotAbility.NEWS
+            "News"
         );
     }
 

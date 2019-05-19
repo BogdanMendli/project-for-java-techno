@@ -1,13 +1,11 @@
-package ru.mail.polis.open.project;
+package ru.mail.polis.open.project.statemachine.states;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
-import ru.mail.polis.open.project.statemachine.states.MainMenuChatState;
-import ru.mail.polis.open.project.statemachine.states.WeatherChatState;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,18 +13,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class WeatherChatStateTest {
 
     private static WeatherChatState weatherChatState;
     private static ChatStateMachine chatStateMachine;
 
     @BeforeAll
-    void createInstance() {
+    static void createInstance() {
         chatStateMachine = new ChatStateMachine();
         weatherChatState = new WeatherChatState(chatStateMachine);
     }
@@ -34,7 +27,7 @@ class WeatherChatStateTest {
     @Test
     void testWorkingUpdate() throws IOException {
 
-        assertEquals(
+        Assertions.assertEquals(
             weatherChatState.update(
                 "gshshsth",
                 345345L,
@@ -42,15 +35,15 @@ class WeatherChatStateTest {
             ),
             "Город не найден!"
         );
-        assertThrows(
+        Assertions.assertThrows(
             NullPointerException.class,
             () -> weatherChatState.update(
                 null,
                 564356L,
                 new ArrayList<>())
         );
-        assertNull(weatherChatState.update("/menu", 453453L, new ArrayList<>()));
-        assertEquals(
+        Assertions.assertNull(weatherChatState.update("/menu", 453453L, new ArrayList<>()));
+        Assertions.assertEquals(
             chatStateMachine.getState(),
             new MainMenuChatState(chatStateMachine)
         );
@@ -76,7 +69,7 @@ class WeatherChatStateTest {
             "Осадки: " + getArray.getJSONObject(0).get("main") + "\n" +
             "http://openweathermap.org/img/w/" + getArray.getJSONObject(0).get("icon") + ".png";
 
-        assertEquals(
+        Assertions.assertEquals(
             resultMsg,
             weatherChatState.update(
                 "Luga",
@@ -88,7 +81,7 @@ class WeatherChatStateTest {
 
     @Test
     void testWorkingGetInitialData() {
-        assertEquals(
+        Assertions.assertEquals(
             weatherChatState.getInitialData(new ArrayList<>()),
             "Погода\nВведите город на английском"
         );

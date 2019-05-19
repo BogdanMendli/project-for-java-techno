@@ -1,33 +1,26 @@
-package ru.mail.polis.open.project;
+package ru.mail.polis.open.project.statemachine.states;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
-import ru.mail.polis.open.project.statemachine.states.MainMenuChatState;
-import ru.mail.polis.open.project.statemachine.states.NewsChatState;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NewsChatStateTest {
 
     private static NewsChatState newsChatState;
     private static ChatStateMachine chatStateMachine;
 
     @BeforeAll
-    void createInstance() {
+    static void createInstance() {
         chatStateMachine = new ChatStateMachine();
         newsChatState = new NewsChatState(chatStateMachine);
     }
@@ -35,25 +28,25 @@ class NewsChatStateTest {
     @Test
     void testWorkingUpdate() throws IOException, FeedException {
 
-        assertEquals(
+        Assertions.assertEquals(
+            "Город не найден!",
             newsChatState.update(
                 "gshshsth",
                 345345L,
                 new ArrayList<>()
-            ),
-            "Город не найден!"
+            )
         );
-        assertThrows(
+        Assertions.assertThrows(
             NullPointerException.class,
             () -> newsChatState.update(
                 null,
                 564356L,
                 new ArrayList<>())
         );
-        assertNull(newsChatState.update("/menu", 453453L, new ArrayList<>()));
-        assertEquals(
-            chatStateMachine.getState(),
-            new MainMenuChatState(chatStateMachine)
+        Assertions.assertNull(newsChatState.update("/menu", 453453L, new ArrayList<>()));
+        Assertions.assertEquals(
+            new MainMenuChatState(chatStateMachine),
+            chatStateMachine.getState()
         );
 
         URL url = new URL("https://news.rambler.ru/rss/Luga");
@@ -85,7 +78,7 @@ class NewsChatStateTest {
             .append("https://news.rambler.ru/")
             .append("Luga");
 
-        assertEquals(
+        Assertions.assertEquals(
             info.toString(),
             newsChatState.update(
                 "Luga",
@@ -97,9 +90,9 @@ class NewsChatStateTest {
 
     @Test
     void testWorkingGetInitialData() {
-        assertEquals(
-            newsChatState.getInitialData(new ArrayList<>()),
-            "Новости\nВведите город на английском"
+        Assertions.assertEquals(
+            "Новости\nВведите город на английском",
+            newsChatState.getInitialData(new ArrayList<>())
         );
     }
 }

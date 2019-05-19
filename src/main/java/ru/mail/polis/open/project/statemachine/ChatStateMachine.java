@@ -4,7 +4,7 @@ import ru.mail.polis.open.project.statemachine.states.ChatState;
 import ru.mail.polis.open.project.statemachine.states.MainMenuChatState;
 import ru.mail.polis.open.project.statemachine.states.NewsChatState;
 import ru.mail.polis.open.project.statemachine.states.WeatherChatState;
-import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
+import ru.mail.polis.open.project.utils.UserSearchStatisticsProvider;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,7 +31,7 @@ public class ChatStateMachine {
     private ChatState state;
 
     /**
-     * Keeps statistics for given chat
+     * Keeps utils for given chat
      */
     private UserSearchStatisticsProvider statistics;
 

@@ -4,7 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import ru.mail.polis.open.project.Bot;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
-import ru.mail.polis.open.project.statistics.UserSearchStatisticsProvider;
+import ru.mail.polis.open.project.utils.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +31,7 @@ public class WeatherChatState implements ChatState {
     }
 
     @Override
-    public String update(String message, long chatId, List<String> buttonsNames) {
+    public String update(String message, long chatId, List<String> mostFrequentRequests) {
         if (message.equals(Bot.MENU_COMMAND)) {
             stateMachine.setState(new MainMenuChatState(stateMachine));
             return null;
@@ -50,10 +50,10 @@ public class WeatherChatState implements ChatState {
             JSONObject main = object.getJSONObject("main");
             JSONArray getArray = object.getJSONArray("weather");
 
-            stateMachine.getStatisticsProvider().onWeatherSearch(object.getString("name"));
-            UserSearchStatisticsProvider.addInfoAboutRequest(message, chatId, "Weather");
+            stateMachine.getStatisticsProvider().onRequest("Weather", object.getString("name"));
+            Logger.addInfoAboutRequest(message, chatId, "Weather");
 
-            buttonsNames.addAll(getMostFrequentCities());
+            mostFrequentRequests.addAll(getMostFrequentCities());
 
 
             return "В городе: " + object.getString("name") + "\n" +
@@ -68,8 +68,8 @@ public class WeatherChatState implements ChatState {
     }
 
     @Override
-    public String getInitialData(List<String> buttonsNames) {
-        buttonsNames.addAll(
+    public String getInitialData(List<String> motFrequentRequest) {
+        motFrequentRequest.addAll(
             getMostFrequentCities()
         );
         return "Погода\nВведите город на английском";
@@ -78,7 +78,7 @@ public class WeatherChatState implements ChatState {
     private List<String> getMostFrequentCities() {
         return stateMachine.getStatisticsProvider().getMostFrequent(
             4,
-            UserSearchStatisticsProvider.BotAbility.WEATHER
+            "Weather"
         );
     }
 
