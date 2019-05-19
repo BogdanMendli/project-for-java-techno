@@ -38,8 +38,8 @@ public class MainMenuChatState implements ChatState {
     }
 
     @Override
-    public String getInitialData(List<String> motFrequentRequest) {
-        motFrequentRequest.addAll(getButtonsNames());
+    public String getInitialData(List<String> mostFrequentRequest) {
+        mostFrequentRequest.addAll(getButtonsNames());
         return "Ты в главном меню!";
     }
 

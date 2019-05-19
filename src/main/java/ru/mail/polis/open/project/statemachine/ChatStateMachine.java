@@ -45,15 +45,15 @@ public class ChatStateMachine {
      * Updates the state of machine
      * @param message - what to do
      * @param chatId - where the request was made
-     * @param buttonsName - out parameter: by the end of method execution
+     * @param buttonsNames - out parameter: by the end of method execution
      *                    it will be filled with strings that should be printed on buttons
      * @return result of operation
      */
-    public String update(String message, Long chatId, List<String> buttonsName) {
-        String result = state.update(message, chatId, buttonsName);
+    public String update(String message, Long chatId, List<String> buttonsNames) {
+        String result = state.update(message, chatId, buttonsNames);
 
         if (result == null) {
-            result = state.getInitialData(buttonsName);
+            result = state.getInitialData(buttonsNames);
         }
 
         return result;

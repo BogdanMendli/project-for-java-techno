@@ -16,9 +16,9 @@ public interface ChatState {
 
     /**
      * Returns the title of the menu and list of strings that should be printed at buttons
-     * @param motFrequentRequest - out parameter: by the end of method execution
+     * @param mostFrequentRequest - out parameter: by the end of method execution
      *      *                    it will be filled with strings that should be printed on buttons
      * @return menu title
      */
-    String getInitialData(List<String> motFrequentRequest);
+    String getInitialData(List<String> mostFrequentRequest);
 }

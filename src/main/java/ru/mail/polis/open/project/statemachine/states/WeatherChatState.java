@@ -68,8 +68,8 @@ public class WeatherChatState implements ChatState {
     }
 
     @Override
-    public String getInitialData(List<String> motFrequentRequest) {
-        motFrequentRequest.addAll(
+    public String getInitialData(List<String> mostFrequentRequest) {
+        mostFrequentRequest.addAll(
             getMostFrequentCities()
         );
         return "Погода\nВведите город на английском";

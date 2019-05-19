@@ -86,8 +86,8 @@ public class NewsChatState implements ChatState {
     }
 
     @Override
-    public String getInitialData(List<String> motFrequentRequest) {
-        motFrequentRequest.addAll(getMostFrequentCities());
+    public String getInitialData(List<String> mostFrequentRequest) {
+        mostFrequentRequest.addAll(getMostFrequentCities());
         return "Новости\nВведите город на английском";
     }
 
