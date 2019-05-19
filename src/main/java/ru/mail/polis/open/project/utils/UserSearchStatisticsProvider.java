@@ -1,5 +1,6 @@
 package ru.mail.polis.open.project.utils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,15 @@ public class UserSearchStatisticsProvider {
             .limit(count)
             .map(Map.Entry::getKey)
             .collect(Collectors.toList());
+    }
+
+    Map<String, Integer> getRequestCounts(String requestType) {
+
+        if (!requests.containsKey(requestType)) {
+            return Collections.emptyMap();
+        }
+
+        return requests.get(requestType);
     }
 
     /**

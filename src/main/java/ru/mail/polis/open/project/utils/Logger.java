@@ -38,20 +38,12 @@ public class Logger {
     }
 
     public static synchronized void clearLog(Long chatId) {
-        try (FileWriter fw = new FileWriter(new File("logs/Statistic-" + chatId + ".txt"))) {
-            fw.write("");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        new File("logs/Statistic-" + chatId + ".txt").delete();
     }
 
     public static synchronized void clearAllLogs() {
         for (File file : new File("logs").listFiles()) {
-            try (FileWriter fw = new FileWriter(file)) {
-                fw.write("");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            file.delete();
         }
     }
 }

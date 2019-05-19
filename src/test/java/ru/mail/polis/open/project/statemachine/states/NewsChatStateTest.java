@@ -36,6 +36,7 @@ class NewsChatStateTest {
                 new ArrayList<>()
             )
         );
+
         Assertions.assertThrows(
             NullPointerException.class,
             () -> newsChatState.update(
@@ -43,6 +44,7 @@ class NewsChatStateTest {
                 564356L,
                 new ArrayList<>())
         );
+
         Assertions.assertNull(newsChatState.update("/menu", 453453L, new ArrayList<>()));
         Assertions.assertEquals(
             new MainMenuChatState(chatStateMachine),

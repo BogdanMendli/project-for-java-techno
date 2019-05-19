@@ -20,65 +20,65 @@ class UserSearchStatisticsProviderTest {
     @Test
     void testWorkingOnWeatherSearch() {
         statisticsProvider.onRequest("Weather", "Moscow");
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().size(), 1);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").size(), 1);
         statisticsProvider.onRequest("Weather", "Luga");
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().size(), 2);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").size(), 2);
         statisticsProvider.onRequest("Weather", "Surgut");
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().size(), 3);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").size(), 3);
         statisticsProvider.onRequest("Weather", "Simpheropol");
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().size(), 4);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").size(), 4);
         statisticsProvider.onRequest("Weather", "Moscow");
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().size(), 4);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").size(), 4);
         statisticsProvider.onRequest("Weather", "Moscow");
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().size(), 4);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").size(), 4);
         statisticsProvider.onRequest("Weather", "Bryansk");
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().size(), 5);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").size(), 5);
         statisticsProvider.onRequest("Weather", "Pskov");
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().size(), 6);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").size(), 6);
         statisticsProvider.onRequest("Weather", "Moscow");
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().size(), 6);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").size(), 6);
         statisticsProvider.onRequest("Weather", "Luga");
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().size(), 6);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").size(), 6);
 
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().get("Moscow"), 4);
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().get("Luga"), 2);
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().get("Surgut"), 1);
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().get("Simpheropol"), 1);
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().get("Bryansk"), 1);
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().get("Pskov"), 1);
-//        assertEquals(statisticsProvider.getCitiesWeatherSearchCounter().size(), 6);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").get("Moscow"), 4);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").get("Luga"), 2);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").get("Surgut"), 1);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").get("Simpheropol"), 1);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").get("Bryansk"), 1);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").get("Pskov"), 1);
+        assertEquals(statisticsProvider.getRequestCounts("Weather").size(), 6);
     }
 
     @Test
     void testWorkingOnNewsSearch() {
         statisticsProvider.onRequest("News", "Moscow");
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().size(), 1);
+        assertEquals(statisticsProvider.getRequestCounts("News").size(), 1);
         statisticsProvider.onRequest("News", "Luga");
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().size(), 2);
+        assertEquals(statisticsProvider.getRequestCounts("News").size(), 2);
         statisticsProvider.onRequest("News", "Surgut");
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().size(), 3);
+        assertEquals(statisticsProvider.getRequestCounts("News").size(), 3);
         statisticsProvider.onRequest("News", "Simpheropol");
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().size(), 4);
+        assertEquals(statisticsProvider.getRequestCounts("News").size(), 4);
         statisticsProvider.onRequest("News", "Moscow");
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().size(), 4);
+        assertEquals(statisticsProvider.getRequestCounts("News").size(), 4);
         statisticsProvider.onRequest("News", "Moscow");
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().size(), 4);
+        assertEquals(statisticsProvider.getRequestCounts("News").size(), 4);
         statisticsProvider.onRequest("News", "Bryansk");
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().size(), 5);
+        assertEquals(statisticsProvider.getRequestCounts("News").size(), 5);
         statisticsProvider.onRequest("News", "Pskov");
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().size(), 6);
+        assertEquals(statisticsProvider.getRequestCounts("News").size(), 6);
         statisticsProvider.onRequest("News", "Moscow");
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().size(), 6);
+        assertEquals(statisticsProvider.getRequestCounts("News").size(), 6);
         statisticsProvider.onRequest("News", "Luga");
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().size(), 6);
+        assertEquals(statisticsProvider.getRequestCounts("News").size(), 6);
 
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().get("Moscow"), 4);
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().get("Luga"), 2);
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().get("Surgut"), 1);
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().get("Simpheropol"), 1);
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().get("Bryansk"), 1);
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().get("Pskov"), 1);
-//        assertEquals(statisticsProvider.getCitiesNewsSearchCounter().size(), 6);
+        assertEquals(statisticsProvider.getRequestCounts("News").get("Moscow"), 4);
+        assertEquals(statisticsProvider.getRequestCounts("News").get("Luga"), 2);
+        assertEquals(statisticsProvider.getRequestCounts("News").get("Surgut"), 1);
+        assertEquals(statisticsProvider.getRequestCounts("News").get("Simpheropol"), 1);
+        assertEquals(statisticsProvider.getRequestCounts("News").get("Bryansk"), 1);
+        assertEquals(statisticsProvider.getRequestCounts("News").get("Pskov"), 1);
+        assertEquals(statisticsProvider.getRequestCounts("News").size(), 6);
     }
 
     @Test
@@ -234,35 +234,6 @@ class UserSearchStatisticsProviderTest {
         );
     }
 
-//    @Test
-//    void testResetRequest() {
-//        UserSearchStatisticsProvider.addInfoAboutRequest(
-//            "Moscow",
-//            444563L,
-//            "News"
-//        );UserSearchStatisticsProvider.addInfoAboutRequest(
-//            "Moscow",
-//            444563L,
-//            "Weather"
-//        );
-//        UserSearchStatisticsProvider.addInfoAboutRequest(
-//            "Moscow",
-//            444563L,
-//            "Weather"
-//        );
-//
-//        try {
-//            BufferedReader br = new BufferedReader(
-//                new FileReader(new File("logs/Statistic-" + 444563L + ".txt"))
-//            );
-//            assertEquals(br.lines().count(), 3);
-//            statisticsProvider.clear(444563L);
-//            assertEquals(br.lines().count(), 0);
-//
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     @AfterEach
     void reset() {
