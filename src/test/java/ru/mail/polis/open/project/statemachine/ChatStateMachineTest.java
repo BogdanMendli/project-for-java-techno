@@ -1,7 +1,6 @@
-package ru.mail.polis.open.project;
+package ru.mail.polis.open.project.statemachine;
 
 import org.junit.jupiter.api.Test;
-import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 import ru.mail.polis.open.project.statemachine.states.MainMenuChatState;
 import ru.mail.polis.open.project.statemachine.states.NewsChatState;
 import ru.mail.polis.open.project.statemachine.states.WeatherChatState;
@@ -17,8 +16,8 @@ class ChatStateMachineTest {
     void testWorkingUpdate() {
         ChatStateMachine chatStateMachine = new ChatStateMachine();
         assertEquals(
-            chatStateMachine.getState(),
-            new MainMenuChatState(chatStateMachine)
+            new MainMenuChatState(chatStateMachine),
+            chatStateMachine.getState()
         );
         assertThrows(
             NullPointerException.class,
@@ -38,8 +37,8 @@ class ChatStateMachineTest {
             )
         );
         assertEquals(
-            chatStateMachine.getState(),
-            new MainMenuChatState(chatStateMachine)
+            new MainMenuChatState(chatStateMachine),
+            chatStateMachine.getState()
         );
 
         assertEquals(
@@ -51,8 +50,8 @@ class ChatStateMachineTest {
             )
         );
         assertEquals(
-            chatStateMachine.getState(),
-            new WeatherChatState(chatStateMachine)
+            new WeatherChatState(chatStateMachine),
+            chatStateMachine.getState()
         );
 
         assertEquals(
@@ -64,8 +63,8 @@ class ChatStateMachineTest {
             )
         );
         assertEquals(
-            chatStateMachine.getState(),
-            new WeatherChatState(chatStateMachine)
+            new WeatherChatState(chatStateMachine),
+            chatStateMachine.getState()
         );
 
         assertEquals(
@@ -90,8 +89,8 @@ class ChatStateMachineTest {
             )
         );
         assertEquals(
-            chatStateMachine.getState(),
-            new MainMenuChatState(chatStateMachine)
+            new MainMenuChatState(chatStateMachine),
+            chatStateMachine.getState()
         );
 
         assertEquals(
@@ -103,8 +102,8 @@ class ChatStateMachineTest {
             )
         );
         assertEquals(
-            chatStateMachine.getState(),
-            new NewsChatState(chatStateMachine)
+            new NewsChatState(chatStateMachine),
+            chatStateMachine.getState()
         );
 
         assertEquals(
@@ -116,8 +115,8 @@ class ChatStateMachineTest {
             )
         );
         assertEquals(
-            chatStateMachine.getState(),
-            new NewsChatState(chatStateMachine)
+            new NewsChatState(chatStateMachine),
+            chatStateMachine.getState()
         );
 
         assertEquals(
@@ -129,8 +128,8 @@ class ChatStateMachineTest {
             )
         );
         assertEquals(
-            chatStateMachine.getState(),
-            new NewsChatState(chatStateMachine)
+            new NewsChatState(chatStateMachine),
+            chatStateMachine.getState()
         );
 
         assertEquals(
@@ -142,8 +141,8 @@ class ChatStateMachineTest {
             )
         );
         assertEquals(
-            chatStateMachine.getState(),
-            new MainMenuChatState(chatStateMachine)
+            new MainMenuChatState(chatStateMachine),
+            chatStateMachine.getState()
         );
     }
 }

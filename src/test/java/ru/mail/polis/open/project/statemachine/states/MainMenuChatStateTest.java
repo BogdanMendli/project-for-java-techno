@@ -1,12 +1,8 @@
-package ru.mail.polis.open.project;
+package ru.mail.polis.open.project.statemachine.states;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
-import ru.mail.polis.open.project.statemachine.states.MainMenuChatState;
-import ru.mail.polis.open.project.statemachine.states.NewsChatState;
-import ru.mail.polis.open.project.statemachine.states.WeatherChatState;
 
 import java.util.ArrayList;
 
@@ -14,14 +10,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MainMenuChatStateTest {
 
     private static ChatStateMachine chatStateMachine;
     private static MainMenuChatState mainMenuChatState;
 
     @BeforeAll
-    void createInstance() {
+    static void createInstance() {
         chatStateMachine = new ChatStateMachine();
         mainMenuChatState = new MainMenuChatState(chatStateMachine);
     }
@@ -30,15 +25,16 @@ class MainMenuChatStateTest {
     void testWorkingUpdate() {
 
         assertEquals(
+             "Ты уже в главном меню!",
             mainMenuChatState.update(
                 "/menu",
                 4455L,
                 new ArrayList<>()
-            ), "Ты уже в главном меню!"
+            )
         );
         assertEquals(
-            chatStateMachine.getState(),
-            new MainMenuChatState(chatStateMachine)
+            new MainMenuChatState(chatStateMachine),
+            chatStateMachine.getState()
         );
         assertThrows(
             NullPointerException.class,
@@ -56,8 +52,8 @@ class MainMenuChatStateTest {
         );
 
         assertEquals(
-            chatStateMachine.getState(),
-            new WeatherChatState(chatStateMachine)
+            new WeatherChatState(chatStateMachine),
+            chatStateMachine.getState()
         );
 
         assertNull(
@@ -69,16 +65,16 @@ class MainMenuChatStateTest {
         );
 
         assertEquals(
-            chatStateMachine.getState(),
-            new NewsChatState(chatStateMachine)
+            new NewsChatState(chatStateMachine),
+            chatStateMachine.getState()
         );
     }
 
     @Test
     void testWorkingGetInitialData() {
         assertEquals(
-            mainMenuChatState.getInitialData(new ArrayList<>()),
-            "Вы в главном меню"
+            "Ты в главном меню!",
+            mainMenuChatState.getInitialData(new ArrayList<>())
         );
     }
 }

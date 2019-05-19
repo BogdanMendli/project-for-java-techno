@@ -8,13 +8,13 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
 import ru.mail.polis.open.project.statemachine.states.ChatState;
 import ru.mail.polis.open.project.statemachine.states.NewsChatState;
 import ru.mail.polis.open.project.statemachine.states.WeatherChatState;
+import ru.mail.polis.open.project.utils.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -186,7 +186,8 @@ public class Bot extends TelegramLongPollingBot {
                                 chatStateMachineSet
                                     .get(message.getChatId())
                                     .getStatisticsProvider()
-                                    .clear(message.getChatId());
+                                    .clear();
+                                Logger.clearLog(message.getChatId());
                                 break;
                             } default: {
                                 List<String> buttonsName = new ArrayList<>();
@@ -228,9 +229,9 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     /**
-     * Direct intervention to StateMashine in order to change it's state by force
+     * Direct intervention to StateMachine in order to change it's state by force
      * @param stateMachine - machine to change state in
-     * @param callbackMessage - message to relpy on
+     * @param callbackMessage - message to reply on
      * @param state - new state of machine
      */
     private void requestProcessing(ChatStateMachine stateMachine, Message callbackMessage, ChatState state) {

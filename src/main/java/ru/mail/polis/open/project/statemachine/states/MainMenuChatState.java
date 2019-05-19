@@ -20,10 +20,10 @@ public class MainMenuChatState implements ChatState {
     }
 
     @Override
-    public String update(String message, long chatId, List<String> buttonsNames) {
+    public String update(String message, long chatId, List<String> mostFrequentRequests) {
         switch (message) {
             case Bot.MENU_COMMAND : {
-                buttonsNames.addAll(getButtonsNames());
+                mostFrequentRequests.addAll(getButtonsNames());
                 return "Ты уже в главном меню!";
             } case Bot.WEATHER_COMMAND: {
                 stateMachine.setState(new WeatherChatState(stateMachine));
@@ -38,8 +38,8 @@ public class MainMenuChatState implements ChatState {
     }
 
     @Override
-    public String getInitialData(List<String> buttonsNames) {
-        buttonsNames.addAll(getButtonsNames());
+    public String getInitialData(List<String> mostFrequentRequest) {
+        mostFrequentRequest.addAll(getButtonsNames());
         return "Ты в главном меню!";
     }
 

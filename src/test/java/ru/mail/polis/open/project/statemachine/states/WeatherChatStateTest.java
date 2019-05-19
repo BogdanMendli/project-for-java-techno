@@ -1,13 +1,10 @@
-package ru.mail.polis.open.project;
+package ru.mail.polis.open.project.statemachine.states;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import ru.mail.polis.open.project.statemachine.ChatStateMachine;
-import ru.mail.polis.open.project.statemachine.states.MainMenuChatState;
-import ru.mail.polis.open.project.statemachine.states.WeatherChatState;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,18 +12,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class WeatherChatStateTest {
 
     private static WeatherChatState weatherChatState;
     private static ChatStateMachine chatStateMachine;
 
     @BeforeAll
-    void createInstance() {
+    static void createInstance() {
         chatStateMachine = new ChatStateMachine();
         weatherChatState = new WeatherChatState(chatStateMachine);
     }
@@ -42,6 +36,7 @@ class WeatherChatStateTest {
             ),
             "Город не найден!"
         );
+
         assertThrows(
             NullPointerException.class,
             () -> weatherChatState.update(
@@ -49,10 +44,11 @@ class WeatherChatStateTest {
                 564356L,
                 new ArrayList<>())
         );
+
         assertNull(weatherChatState.update("/menu", 453453L, new ArrayList<>()));
         assertEquals(
-            chatStateMachine.getState(),
-            new MainMenuChatState(chatStateMachine)
+            new MainMenuChatState(chatStateMachine),
+            chatStateMachine.getState()
         );
 
         URL url = new URL(
